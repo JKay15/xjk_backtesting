@@ -119,7 +119,6 @@ class Strategy(with_metaclass(MetaStrategy, StrategyBase)):
             for itcls in self._lineiterators:
                 for it in self._lineiterators[itcls]:
                     it.qbuffer(savemem=1)
-        # 其实应该还有一个等于0的时候，不操作，作者忽略了，写上去吧，逻辑上更严谨
         else:
             pass
     # 获取并设置策略运行需要的数据的最小周期
