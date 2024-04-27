@@ -713,6 +713,7 @@ class Cerebro(with_metaclass(MetaParams, object)):
                 # 遍历每个data,进行reset,如果_exactbars小于1，对数据进行extend处理
                 # 开始数据
                 # 如果数据_dopreload的话，对数据调用preloadfor data in self.datas:
+                for data in self.datas:
                     data.reset()
                     if self._exactbars < 1:  
                         data.extend(size=self.params.lookahead)
