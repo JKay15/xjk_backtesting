@@ -48,12 +48,12 @@ class Timer(with_metaclass(MetaParams, object)):
     def start(self, data):
         # 如果参数when不是整数
         if not isinstance(self.p.when, integer_types): 
-            # 重新设置when，并且设置时区数据
+            # 重新设置when，并且设置时区data_folder
             self._rstwhen = self.p.when
             self._tzdata = self.p.tzdata
         # 如果参数when是整数的话
         else:
-            # 如果时区数据是None的话，时区数据等于data,否则，时区数据就是tzdata
+            # 如果时区data_folder是None的话，时区data_folder等于data,否则，时区data_folder就是tzdata
             self._tzdata = data if self.p.tzdata is None else self.p.tzdata
             # 如果when等于开盘时间，重新设置时间为开盘时间
             if self.p.when == SESSION_START:
@@ -61,7 +61,7 @@ class Timer(with_metaclass(MetaParams, object)):
             # 如果when等于收盘时间，重新设置时间为收盘时间
             elif self.p.when == SESSION_END:
                 self._rstwhen = self._tzdata.p.sessionend
-        # 判断时区数据是否是数据
+        # 判断时区data_folder是否是data_folder
         self._isdata = isinstance(self._tzdata, AbstractDataBase)
         # 重新设置when
         self._reset_when()
@@ -118,7 +118,7 @@ class Timer(with_metaclass(MetaParams, object)):
             dc += curday
         else:
             curday = False
-        # 当dc大于0的时候，每次从最左边删除一个数据，dc同时减去1
+        # 当dc大于0的时候，每次从最左边删除一个data_folder，dc同时减去1
         while dc:
             mask.popleft()
             dc -= 1
@@ -156,7 +156,7 @@ class Timer(with_metaclass(MetaParams, object)):
             dc += curday
         else:
             curday = False
-        # 当dc大于0的时候，每次从最左边删除一个数据，dc同时减去1
+        # 当dc大于0的时候，每次从最左边删除一个data_folder，dc同时减去1
         while dc:
             mask.popleft()
             dc -= 1
@@ -174,7 +174,7 @@ class Timer(with_metaclass(MetaParams, object)):
             return False
         # 如果当前时间大于这个交易日结束的时间
         if d > self._nexteos:
-            # 如果_tzdata是时区数据，调用_getnexteos()，返回具体的时间，否则，就把这个交易日最晚的时间作为结束时间
+            # 如果_tzdata是时区data_folder，调用_getnexteos()，返回具体的时间，否则，就把这个交易日最晚的时间作为结束时间
             if self._isdata: 
                 nexteos, _ = self._tzdata._getnexteos()
             # 如果_tzdata是时区的话，合成当前交易日最大的时间
@@ -210,7 +210,7 @@ class Timer(with_metaclass(MetaParams, object)):
                 dwhen += self.p.offset
             # 设置_dwhen
             self._dwhen = dwhen
-            # 如果_tzdata是数据的话，把dwhen设置为dtwhen
+            # 如果_tzdata是data_folder的话，把dwhen设置为dtwhen
             if self._isdata:
                 self._dtwhen = dtwhen = self._tzdata.date2num(dwhen)
             # 否则，转换程时间的时候需要使用时区
@@ -229,7 +229,7 @@ class Timer(with_metaclass(MetaParams, object)):
         else:
             # 如果日期的时间大于当前交易日最后的时间
             if d > self._nexteos:
-                # 如果tzdata是数据的话，获取当前交易日最后的时间
+                # 如果tzdata是data_folder的话，获取当前交易日最后的时间
                 if self._isdata: 
                     nexteos, _ = self._tzdata._getnexteos()
                 # 如果_tzdata是时区的话，合成当前交易日最大的时间
@@ -252,7 +252,7 @@ class Timer(with_metaclass(MetaParams, object)):
                 if dwhen > d: 
                     # 把下个定时器的时间转化成时间戳
                     self._dtwhen = dtwhen = date2num(dwhen) 
-                    # 如果_tzdata是数据的话，计算下个定时器到的时间，如果_tzdata是时区的话，计算考虑时区之后的下个定时器到的时间。
+                    # 如果_tzdata是data_folder的话，计算下个定时器到的时间，如果_tzdata是时区的话，计算考虑时区之后的下个定时器到的时间。
                     if self._isdata:
                         self._dwhen = self._tzdata.num2date(dtwhen)
                     else:  

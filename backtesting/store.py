@@ -22,7 +22,7 @@ class Store(with_metaclass(MetaSingleton, object)):
     _started = False
     # 参数
     params = ()
-    # 获取数据
+    # 获取data_folder
     def getdata(self, *args, **kwargs):
         data = self.DataCls(*args, **kwargs)
         data._store = self
@@ -46,7 +46,7 @@ class Store(with_metaclass(MetaSingleton, object)):
             self.notifs = collections.deque()
             self.datas = list()
             self.broker = None
-        # 如果数据不是None
+        # 如果data_folder不是None
         if data is not None:
             self._cerebro = self._env = data._env
             self.datas.append(data)

@@ -77,7 +77,7 @@ class Indicator(with_metaclass(MetaIndicator, IndicatorBase)):
     # 输出到csv文件被设置成False
     csv = False
 
-    # 当数据小于当前时间的时候，数据向前移动size
+    # 当data_folder小于当前时间的时候，data_folder向前移动size
     def advance(self, size=1):
         if len(self) < len(self._clock):
             self.lines.advance(size=size)
@@ -86,7 +86,7 @@ class Indicator(with_metaclass(MetaIndicator, IndicatorBase)):
     def preonce_via_prenext(self, start, end):
         # 从start到end进行循环
         for i in range(start, end):
-            # 数据每次增加
+            # data_folder每次增加
             for data in self.datas:
                 data.advance()
 

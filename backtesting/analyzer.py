@@ -26,15 +26,15 @@ class MetaAnalyzer(bt.MetaParams):
         # 如果有obs的话，就把analyzer注册到obs中
         if masterobs is not None:
             masterobs._register_analyzer(_obj)
-        # analyzer的数据
+        # analyzer的data_folder
         _obj.datas = strategy.datas
 
-        # 如果analyzer的数据不是None的话
+        # 如果analyzer的data_folder不是None的话
         if _obj.datas:
-            # analyzer的data就是第一个数据
+            # analyzer的data就是第一个data_folder
             _obj.data = data = _obj.datas[0]
 
-            # 对于数据里面的每条line
+            # 对于data_folder里面的每条line
             for l, line in enumerate(data.lines):
                 # 获取line的名字
                 linealias = data._getlinealias(l)
@@ -44,11 +44,11 @@ class MetaAnalyzer(bt.MetaParams):
                 # 根据index设置line的名称
                 setattr(_obj, 'data_%d' % l, line)
 
-            # 循环数据，给数据设置不同的名称，可以通过data_d访问
+            # 循环data_folder，给data_folder设置不同的名称，可以通过data_d访问
             for d, data in enumerate(_obj.datas):
                 setattr(_obj, 'data%d' % d, data)
 
-                # 对不同的数据设置具体的属性名，可以通过属性名访问line
+                # 对不同的data_folder设置具体的属性名，可以通过属性名访问line
                 for l, line in enumerate(data.lines):
                     linealias = data._getlinealias(l)
                     if linealias:
@@ -96,7 +96,7 @@ class Analyzer(with_metaclass(MetaAnalyzer, object)):
 
       - ``self.data_Y`` -> ``self.datas[0].lines[Y]``
 
-    # 访问数据的方法
+    # 访问data_folder的方法
 
     This is not a *Lines* object, but the methods and operation follow the same
     design
@@ -238,7 +238,7 @@ class Analyzer(with_metaclass(MetaAnalyzer, object)):
     def get_analysis(self):
         return self.rets
 
-    # print数据，通过writerfile打印相应的数据到标准输出
+    # printdata_folder，通过writerfile打印相应的data_folder到标准输出
     def print(self, *args, **kwargs):
         # 创建一个writer
         writer = bt.WriterFile(*args, **kwargs)

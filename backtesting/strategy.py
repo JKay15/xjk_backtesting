@@ -85,15 +85,15 @@ class Strategy(with_metaclass(MetaStrategy, StrategyBase)):
     # 旧的更新时间的方法，默认是False
     _oldsync = False  
 
-    # 保存最新的数据的日期
+    # 保存最新的data_folder的日期
     lines = ('datetime',)
-    # 缓存数据
+    # 缓存data_folder
     def qbuffer(self, savemem=0, replaying=False):
         '''
-        # 根据savemem的值执行不同的数据保存方案
-        # 如果savemem等于0的话，那么所有line的数据都会被保存到内存中
-        # 如果savemem等于1的话，执行保存所需要的最小的数据量，节省内存
-        # 如果savemen等于-1的话，那么策略和观察者里面的指标需要保存所有的数据，但是指标里面声明的line会节省内存
+        # 根据savemem的值执行不同的data_folder保存方案
+        # 如果savemem等于0的话，那么所有line的data_folder都会被保存到内存中
+        # 如果savemem等于1的话，执行保存所需要的最小的data_folder量，节省内存
+        # 如果savemen等于-1的话，那么策略和观察者里面的指标需要保存所有的data_folder，但是指标里面声明的line会节省内存
         # 如果savemen等于-2的话，除了等于-1里面的，还要加上plotinfo.plot设置成False的也会节省内存
         '''
         # 如果savemem小于0
@@ -109,7 +109,7 @@ class Strategy(with_metaclass(MetaStrategy, StrategyBase)):
                 ind.qbuffer(savemem=subsave)
         # 如果savemem大于0
         elif savemem > 0:
-            # 对所有的数据执行节省内存计划
+            # 对所有的data_folder执行节省内存计划
             for data in self.datas:
                 data.qbuffer(replaying=replaying)
             # 对所有的line执行节省内存计划
@@ -121,11 +121,11 @@ class Strategy(with_metaclass(MetaStrategy, StrategyBase)):
                     it.qbuffer(savemem=1)
         else:
             pass
-    # 获取并设置策略运行需要的数据的最小周期
+    # 获取并设置策略运行需要的data_folder的最小周期
     def _periodset(self):
-        # 数据的id
+        # data_folder的id
         dataids = [id(data) for data in self.datas]
-        # 数据的最小周期
+        # data_folder的最小周期
         _dminperiods = collections.defaultdict(list)
         # 循环所有的指标
         for lineiter in self._lineiterators[LineIterator.IndType]:
@@ -139,7 +139,7 @@ class Strategy(with_metaclass(MetaStrategy, StrategyBase)):
                     continue
             # 如果clk不是None的话
             while True:
-                # 如果clk是数据的话，中断
+                # 如果clk是data_folder的话，中断
                 if id(clk) in dataids:
                     break  
 
@@ -163,19 +163,19 @@ class Strategy(with_metaclass(MetaStrategy, StrategyBase)):
             _dminperiods[clk].append(lineiter._minperiod)
         # 最小周期设置成空列表
         self._minperiods = list()
-        # 循环所有的数据
+        # 循环所有的data_folder
         for data in self.datas:
 
-            # 数据产生指标的line的时候需要的最小周期
+            # data_folder产生指标的line的时候需要的最小周期
             dlminperiods = _dminperiods[data]
-            # 循环数据的每条line,如果line在_dminperiods中，dlminperiods需要增加一定的值
+            # 循环data_folder的每条line,如果line在_dminperiods中，dlminperiods需要增加一定的值
             for l in data.lines: 
                 if l in _dminperiods:
                     dlminperiods += _dminperiods[l] 
 
             # 如果dlminperiods不是空列表，就计算最大的值最为_dminperiods[data]的值，否则就是空的列表
             _dminperiods[data] = [max(dlminperiods)] if dlminperiods else []
-            # 数据的最小周期
+            # data_folder的最小周期
             dminperiod = max(_dminperiods[data] or [data._minperiod])
             # 把最小周期保存到dminperiod中
             self._minperiods.append(dminperiod)
@@ -183,7 +183,7 @@ class Strategy(with_metaclass(MetaStrategy, StrategyBase)):
         # 指标的最小周期
         minperiods = \
             [x._minperiod for x in self._lineiterators[LineIterator.IndType]]
-        # 把指标的最小周期和数据的最小周期的最大值作为策略运行需要的最小周期
+        # 把指标的最小周期和data_folder的最小周期的最大值作为策略运行需要的最小周期
         self._minperiod = max(minperiods or [self._minperiod])
 
     # 增加writer
@@ -234,7 +234,7 @@ class Strategy(with_metaclass(MetaStrategy, StrategyBase)):
         for data in self.datas:
             obs = obscls(data, *obsargs, **obskwargs)
             l.append(obs)
-    # 检查最小周期是否满足，返回的是最小周期减去每个数据长度的最大值
+    # 检查最小周期是否满足，返回的是最小周期减去每个data_folder长度的最大值
     def _getminperstatus(self):
         dlens = map(operator.sub, self._minperiods, map(len, self.datas))
         self._minperstatus = minperstatus = max(dlens)
@@ -252,9 +252,9 @@ class Strategy(with_metaclass(MetaStrategy, StrategyBase)):
     def next_open(self):
         pass
 
-    # 准备开始_oncepost,根据数据的状态调用不同的函数，minperstatus小于0,代表所有数据都满足了最小周期，调用next_open
-    # 如果minperstatus=0,代表数据刚准备齐全，调用self.nextstart_open
-    # 如果minperstatus<0,代表数据还没有准备全，调用self.prenext_open
+    # 准备开始_oncepost,根据data_folder的状态调用不同的函数，minperstatus小于0,代表所有data_folder都满足了最小周期，调用next_open
+    # 如果minperstatus=0,代表data_folder刚准备齐全，调用self.nextstart_open
+    # 如果minperstatus<0,代表data_folder还没有准备全，调用self.prenext_open
     def _oncepost_open(self):
 
         minperstatus = self._minperstatus
@@ -266,11 +266,11 @@ class Strategy(with_metaclass(MetaStrategy, StrategyBase)):
             self.prenext_open()
 
     def _oncepost(self, dt):
-        # 循环指标，如果指标数据的长度大于指标的长度了，继续运行指标
+        # 循环指标，如果指标data_folder的长度大于指标的长度了，继续运行指标
         for indicator in self._lineiterators[LineIterator.IndType]:
             if len(indicator._clock) > len(indicator):
                 indicator.advance()
-        # 如果是旧的数据处理方式，调用advance;如果不是旧的数据处理方式，代表策略已经初始化了，调用advance
+        # 如果是旧的data_folder处理方式，调用advance;如果不是旧的data_folder处理方式，代表策略已经初始化了，调用advance
         if self._oldsync:
             self.advance()
         else:
@@ -279,9 +279,9 @@ class Strategy(with_metaclass(MetaStrategy, StrategyBase)):
         self.lines.datetime[0] = dt
         # 通知
         self._notify()
-        # 获取当前最小周期状态，如果所有数据都满足了，调用next
-        # 如果正好所有数据都满足了，调用nextstart
-        # 如果不是所有的数据都满足了，调用prenext
+        # 获取当前最小周期状态，如果所有data_folder都满足了，调用next
+        # 如果正好所有data_folder都满足了，调用nextstart
+        # 如果不是所有的data_folder都满足了，调用prenext
         minperstatus = self._getminperstatus()
         if minperstatus < 0:
             self.next()
@@ -295,26 +295,26 @@ class Strategy(with_metaclass(MetaStrategy, StrategyBase)):
         self._next_observers(minperstatus, once=True)
         # 清除
         self.clear()
-    # 更新数据
+    # 更新data_folder
     def _clk_update(self):
-        # 如果是旧的数据管理方法
+        # 如果是旧的data_folder管理方法
         if self._oldsync:
             # 调用策略的_clk_uddate()方法
             clk_len = super(Strategy, self)._clk_update()
             # 设置时间
             self.lines.datetime[0] = max(d.datetime[0]
                                          for d in self.datas if len(d))
-            # 返回数据长度
+            # 返回data_folder长度
             return clk_len
-        # 当前最新的数据长度
+        # 当前最新的data_folder长度
         newdlens = [len(d) for d in self.datas]
-        # 如果新的数据长度大于旧的数据长度，就forward
+        # 如果新的data_folder长度大于旧的data_folder长度，就forward
         if any(nl > l for l, nl in zip(self._dlens, newdlens)):
             self.forward()
-        # 设置时间，当前数据中的最大的时间
+        # 设置时间，当前data_folder中的最大的时间
         self.lines.datetime[0] = max(d.datetime[0]
                                      for d in self.datas if len(d))
-        # 旧的数据长度等于新的数据长度
+        # 旧的data_folder长度等于新的data_folder长度
         self._dlens = newdlens
 
         return len(self)
@@ -329,7 +329,7 @@ class Strategy(with_metaclass(MetaStrategy, StrategyBase)):
         else:
             self.prenext_open()
 
-    # _next方法,获取最小数据周期状态，并且添加给analyzer和observer中，然后clear
+    # _next方法,获取最小data_folder周期状态，并且添加给analyzer和observer中，然后clear
     def _next(self):
         super(Strategy, self)._next()
 
@@ -354,9 +354,9 @@ class Strategy(with_metaclass(MetaStrategy, StrategyBase)):
                     analyzer._prenext()
             # 如果是once的话
             if once:
-                # 如果当前数据长度大于observer的长度
+                # 如果当前data_folder长度大于observer的长度
                 if len(self) > len(observer):
-                    # 如果是使用的旧的数据管理方法，调用advance，如果不是旧的，调用forward
+                    # 如果是使用的旧的data_folder管理方法，调用advance，如果不是旧的，调用forward
                     if self._oldsync:
                         observer.advance()
                     else:
@@ -402,7 +402,7 @@ class Strategy(with_metaclass(MetaStrategy, StrategyBase)):
 
         # 把操作转变到第二种状态
         self._stage2()
-        # 当前每个数据的长度
+        # 当前每个data_folder的长度
         self._dlens = [len(data) for data in self.datas]
         # 当前最小周期状态默认是最大的整数
         self._minperstatus = MAXINT  
@@ -491,7 +491,7 @@ class Strategy(with_metaclass(MetaStrategy, StrategyBase)):
         for analyzer in itertools.chain(self.analyzers, self._slave_analyzers):
             analyzer._stop()
 
-        # 把操作状态转变为状态1,允许重新使用数据
+        # 把操作状态转变为状态1,允许重新使用data_folder
         self._stage1()
 
     # 策略结束
@@ -499,7 +499,7 @@ class Strategy(with_metaclass(MetaStrategy, StrategyBase)):
         '''Called right before the backtesting is about to be stopped'''
         pass
 
-    # 设置是否保存历史交易数据
+    # 设置是否保存历史交易data_folder
     def set_tradehistory(self, onoff=True):
         self._tradehistoryon = onoff
 
@@ -524,11 +524,11 @@ class Strategy(with_metaclass(MetaStrategy, StrategyBase)):
             if quicknotify:
                 self._notify(qorders=qorders, qtrades=qtrades)
             return
-        # 获取交易的数据,如果order.data._compensate是None的话，那么tradedata就是order.data，否则就是order.data._compensate
+        # 获取交易的data_folder,如果order.data._compensate是None的话，那么tradedata就是order.data，否则就是order.data._compensate
         tradedata = order.data._compensate
         if tradedata is None:
             tradedata = order.data
-        # 获取交易数据，如果能从_trades中获取交易数据，就使用最后一个作为trade，如果不能，就创建一个trade，保存到datatrades中
+        # 获取交易data_folder，如果能从_trades中获取交易data_folder，就使用最后一个作为trade，如果不能，就创建一个trade，保存到datatrades中
         datatrades = self._trades[tradedata][order.tradeid]
         if not datatrades:
             trade = Trade(data=tradedata, tradeid=order.tradeid,
@@ -733,11 +733,11 @@ class Strategy(with_metaclass(MetaStrategy, StrategyBase)):
                       in the system (aka ``self.data0``) will be used as the reference
                       to find out the session times.
 
-                    # 时区数据，可以是None，或者pytz实例，或者datafeed实例
-                    # 当时区数据是None的时候，when将会按照字面意思处理，即使不是utc时间，也会当成是
-                    # 当时区数据是pytz实例的时候，when将会被pytz时区处理之后转换成本地时间
-                    # 当时区数据是datafeed实例的时候，when将会被datafeed的tz参数转换成本地时间
-                    # 如果when是SESSION_START或者SESSION_END，并且tzdata是None的时候，将会使用系统的第一个数据
+                    # 时区data_folder，可以是None，或者pytz实例，或者datafeed实例
+                    # 当时区data_folder是None的时候，when将会按照字面意思处理，即使不是utc时间，也会当成是
+                    # 当时区data_folder是pytz实例的时候，when将会被pytz时区处理之后转换成本地时间
+                    # 当时区data_folder是datafeed实例的时候，when将会被datafeed的tz参数转换成本地时间
+                    # 如果when是SESSION_START或者SESSION_END，并且tzdata是None的时候，将会使用系统的第一个data_folder
                     # 用于找到具体的时间
 
                   - ``cheat`` (default ``False``) if ``True`` the timer will be called
@@ -789,15 +789,15 @@ class Strategy(with_metaclass(MetaStrategy, StrategyBase)):
     def notify_store(self, msg, *args, **kwargs):
         pass
 
-    # 通知数据
+    # 通知data_folder
     def notify_data(self, data, status, *args, **kwargs):
         pass
 
-    # 获取存在的数据名称
+    # 获取存在的data_folder名称
     def getdatanames(self):
         return keys(self.env.datasbyname)
 
-    # 根据名称获取数据
+    # 根据名称获取data_folder
     def getdatabyname(self, name):
         return self.env.datasbyname[name]
 
@@ -820,7 +820,7 @@ class Strategy(with_metaclass(MetaStrategy, StrategyBase)):
             For which data the order has to be created. If ``None`` then the
             first data in the system, ``self.datas[0] or self.data0`` (aka
             ``self.data``) will be used
-            # 用于在那个数据上进行下单，如果是None的话，将会默认使用第一个数据
+            # 用于在那个data_folder上进行下单，如果是None的话，将会默认使用第一个data_folder
 
           - ``size`` (default: ``None``)
 
@@ -1000,7 +1000,7 @@ class Strategy(with_metaclass(MetaStrategy, StrategyBase)):
         # 如果data是字符串格式，获取具体的data
         if isinstance(data, string_types):
             data = self.getdatabyname(data)
-        # 如果data不是None的时候，使用data，否则就使用第一个数据
+        # 如果data不是None的时候，使用data，否则就使用第一个data_folder
         data = data if data is not None else self.datas[0]
         # 如果size不是None的时候，size等于size,否则就通过getsizing获取size
         size = size if size is not None else self.getsizing(data, isbuy=True)
@@ -1042,12 +1042,12 @@ class Strategy(with_metaclass(MetaStrategy, StrategyBase)):
 
     # 关闭
     def close(self, data=None, size=None, **kwargs):
-        # 获取数据
+        # 获取data_folder
         if isinstance(data, string_types):
             data = self.getdatabyname(data)
         elif data is None:
             data = self.data
-        # 获取数据的持仓大小
+        # 获取data_folder的持仓大小
         possize = self.getposition(data, self.broker).size
         # 如果size是None的时候，就把当前持仓全部平掉，如果size不是None的话，就会平掉size的
         size = abs(size if size is not None else possize)
@@ -1334,7 +1334,7 @@ class Strategy(with_metaclass(MetaStrategy, StrategyBase)):
 
     # 目标金额订单，跟目标大小订单比较类似
     def order_target_value(self, data=None, target=0.0, price=None, **kwargs):
-        # 获取数据
+        # 获取data_folder
         if isinstance(data, string_types):
             data = self.getdatabyname(data)
         elif data is None:
@@ -1350,7 +1350,7 @@ class Strategy(with_metaclass(MetaStrategy, StrategyBase)):
             value = self.broker.getvalue(datas=[data])
             # 获取佣金信息
             comminfo = self.broker.getcommissioninfo(data)
-            # 获取price，如果price不是None的话，就用price,否则就用数据的收盘价
+            # 获取price，如果price不是None的话，就用price,否则就用data_folder的收盘价
             # Make sure a price is there
             price = price if price is not None else data.close[0]
             # 如果目标价值大于value，就计算需要buy的size大小，发出buy订单
@@ -1366,7 +1366,7 @@ class Strategy(with_metaclass(MetaStrategy, StrategyBase)):
 
     # 目标百分比订单，会下一个订单再平衡当前的仓位，以确保仓位价值占现在账户价值的target百分比
     def order_target_percent(self, data=None, target=0.0, **kwargs):
-        # 获取数据
+        # 获取data_folder
         if isinstance(data, string_types):
             data = self.getdatabyname(data)
         elif data is None:
@@ -1377,16 +1377,16 @@ class Strategy(with_metaclass(MetaStrategy, StrategyBase)):
 
         return self.order_target_value(data=data, target=target, **kwargs)
 
-    # 获取数据的持仓，如果数据是None的话，将会获取第一个数据的持仓，如果broker是None的话，使用默认的broker
+    # 获取data_folder的持仓，如果data_folder是None的话，将会获取第一个data_folder的持仓，如果broker是None的话，使用默认的broker
     def getposition(self, data=None, broker=None):
         data = data if data is not None else self.datas[0]
         broker = broker or self.broker
         return broker.getposition(data)
 
-    # 也可以通过属性position来获取数据持仓
+    # 也可以通过属性position来获取data_folder持仓
     position = property(getposition)
 
-    # 根据数据的名字来获取持仓大小，如果数据是None的话，默认获取第一个数据的持仓，如果不是None,获取具体的数据
+    # 根据data_folder的名字来获取持仓大小，如果data_folder是None的话，默认获取第一个data_folder的持仓，如果不是None,获取具体的data_folder
     # 如果broker不是None，使用参数传递的broker，否则使用默认的broker
     def getpositionbyname(self, name=None, broker=None):
         data = self.datas[0] if not name else self.getdatabyname(name)
@@ -1463,7 +1463,7 @@ class MetaSigStrategy(Strategy.__class__):
             super(MetaSigStrategy, cls).dopreinit(_obj, *args, **kwargs)
         # 初始化_signals为一个默认字典
         _obj._signals = collections.defaultdict(list)
-        # 设置下单的数据
+        # 设置下单的data_folder
         _data = _obj.p._data
         if _data is None:
             _obj._dtarget = _obj.data0
@@ -1481,7 +1481,7 @@ class MetaSigStrategy(Strategy.__class__):
     def dopostinit(cls, _obj, *args, **kwargs):
         _obj, args, kwargs = \
             super(MetaSigStrategy, cls).dopostinit(_obj, *args, **kwargs)
-        # 把信号数据保存到signals中
+        # 把信号data_folder保存到signals中
         for sigtype, sigcls, sigargs, sigkwargs in _obj.p.signals:
             _obj._signals[sigtype].append(sigcls(*sigargs, **sigkwargs))
 
@@ -1594,9 +1594,9 @@ class SignalStrategy(with_metaclass(MetaSigStrategy, Strategy)):
 
         - A ``data`` instance
 
-        # 数据，默认是None，数据可以是下面的值：
-        # None，将会默认使用第一个数据
-        # int,将会获取datas[int]这个数据
+        # data_folder，默认是None，data_folder可以是下面的值：
+        # None，将会默认使用第一个data_folder
+        # int,将会获取datas[int]这个data_folder
         # str，将会使用getdatabyname获取data
         # data实例，直接使用
 

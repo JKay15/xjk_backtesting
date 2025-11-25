@@ -14,7 +14,7 @@ from .dataseries import SimpleFilterWrapper
 from .resamplerfilter import Resampler, Replayer
 from .tradingcal import PandasMarketCalendar
 
-# 这个元抽象类主要继承OHLCDateTime，然后在初始化的时候对数据的名称、时间、过滤器等进行一定的处理
+# 这个元抽象类主要继承OHLCDateTime，然后在初始化的时候对data_folder的名称、时间、过滤器等进行一定的处理
 class MetaAbstractDataBase(dataseries.OHLCDateTime.__class__):
     # _indcol的属性设置为一个空的字典
     _indcol = dict()
@@ -102,7 +102,7 @@ class MetaAbstractDataBase(dataseries.OHLCDateTime.__class__):
 
         return _obj, args, kwargs
 
-# 这个类是抽象数据基类，继承MetaAbstractDataBase和dataseries.OHLCDateTime
+# 这个类是抽象data_folder基类，继承MetaAbstractDataBase和dataseries.OHLCDateTime
 class AbstractDataBase(with_metaclass(MetaAbstractDataBase,
                                       dataseries.OHLCDateTime)):
     # 参数的初始化设置
@@ -121,7 +121,7 @@ class AbstractDataBase(with_metaclass(MetaAbstractDataBase,
         ('qcheck', 0.0),  # timeout in seconds (float) to check for events
         ('calendar', None),
     )
-    # 数据的八种不同的状态
+    # data_folder的八种不同的状态
     (CONNECTED, DISCONNECTED, CONNBROKEN, DELAYED,
      LIVE, NOTSUBSCRIBED, NOTSUPPORTED_TF, UNKNOWN) = range(8)
 
@@ -130,7 +130,7 @@ class AbstractDataBase(with_metaclass(MetaAbstractDataBase,
         'CONNECTED', 'DISCONNECTED', 'CONNBROKEN', 'DELAYED',
         'LIVE', 'NOTSUBSCRIBED', 'NOTSUPPORTED_TIMEFRAME', 'UNKNOWN']
 
-    # 类方法，获取数据的状态
+    # 类方法，获取data_folder的状态
     @classmethod
     def _getstatusname(cls, status):
         return cls._NOTIFNAMES[status]
@@ -237,16 +237,16 @@ class AbstractDataBase(with_metaclass(MetaAbstractDataBase,
 
         return num2date(dt, tz or self._tz, naive)
 
-    # 是否具有实时数据，默认是没有，如果有实时数据，需要重写
+    # 是否具有实时data_folder，默认是没有，如果有实时data_folder，需要重写
     def haslivedata(self):
         return False  
 
-    # 实盘数据进行抽样的时候，等待的时间间隔
+    # 实盘data_folder进行抽样的时候，等待的时间间隔
     def do_qcheck(self, onoff, qlapse):
         qwait = self.p.qcheck if onoff else 0.0
         qwait = max(0.0, qwait - qlapse)
         self._qcheck = qwait
-    # 是否是实时数据，默认是没有，如果有的话，cerebro会不在使用preload和runonce，因为一个实时数据需要
+    # 是否是实时data_folder，默认是没有，如果有的话，cerebro会不在使用preload和runonce，因为一个实时data_folder需要
     # 一个个tick或者bar进行获取
     def islive(self):
         return False
@@ -274,7 +274,7 @@ class AbstractDataBase(with_metaclass(MetaAbstractDataBase,
     def getfeed(self):
         return self._feed
 
-    # 缓存数据的量
+    # 缓存data_folder的量
     def qbuffer(self, savemem=0, replaying=False):
         extrasize = self.resampling or replaying
         for line in self.lines:
@@ -290,11 +290,11 @@ class AbstractDataBase(with_metaclass(MetaAbstractDataBase,
     def stop(self):
         pass
 
-    # 克隆数据
+    # 克隆data_folder
     def clone(self, **kwargs):
         return DataClone(dataname=self, **kwargs)
 
-    # 复制数据并作为另外一个名字
+    # 复制data_folder并作为另外一个名字
     def copyas(self, _dataname, **kwargs):
         d = DataClone(dataname=self, **kwargs)
         d._dataname = _dataname
@@ -331,7 +331,7 @@ class AbstractDataBase(with_metaclass(MetaAbstractDataBase,
 
         self._compensate = other
 
-    # 给非datetime的名称设置一个tick_+名称的属性为None，主要是在从高频率数据合成低频率数据的时候使用
+    # 给非datetime的名称设置一个tick_+名称的属性为None，主要是在从高频率data_folder合成低频率data_folder的时候使用
     def _tick_nullify(self):
         for lalias in self.getlinealiases():
             if lalias != 'datetime':
@@ -339,7 +339,7 @@ class AbstractDataBase(with_metaclass(MetaAbstractDataBase,
 
         self.tick_last = None
 
-    # 如果tick_xxx相关的属性值是None的话，就要考虑使用bar的数据去填充
+    # 如果tick_xxx相关的属性值是None的话，就要考虑使用bar的data_folder去填充
     def _tick_fill(self, force=False):
         alias0 = self._getlinealias(0)
         if force or getattr(self, 'tick_' + alias0, None) is None:
@@ -357,7 +357,7 @@ class AbstractDataBase(with_metaclass(MetaAbstractDataBase,
 
         return float('inf')  
 
-    # 把数据向前移动size
+    # 把data_folder向前移动size
     def advance(self, size=1, datamaster=None, ticks=True):
         if ticks:
             self._tick_nullify()
@@ -379,11 +379,11 @@ class AbstractDataBase(with_metaclass(MetaAbstractDataBase,
             if ticks:
                 self._tick_fill()
 
-    # 调用next时，在数据上发生的事情
+    # 调用next时，在data_folder上发生的事情
     def next(self, datamaster=None, ticks=True):
-        # 如果数据长度大于缓存的数据长度，如果是ticks数据的话，调用_tick_nullify生成tick_xxx属性，然后调用load尝试获取下一个bar，如果获取到的ret是空的
-        # 返回ret.如果主数据是None的话，如果是ticks数据的话，需要调用_tick_fill.
-        # 如果自身的长度小于缓存的数据的长度，向前移动
+        # 如果data_folder长度大于缓存的data_folder长度，如果是ticksdata_folder的话，调用_tick_nullify生成tick_xxx属性，然后调用load尝试获取下一个bar，如果获取到的ret是空的
+        # 返回ret.如果主data_folder是None的话，如果是ticksdata_folder的话，需要调用_tick_fill.
+        # 如果自身的长度小于缓存的data_folder的长度，向前移动
         if len(self) >= self.buflen():
             if ticks:
                 self._tick_nullify()
@@ -398,9 +398,9 @@ class AbstractDataBase(with_metaclass(MetaAbstractDataBase,
                 return ret
         else:
             self.advance(ticks=ticks)
-        # 如果主数据不是None，如果当前数据的时间大于了主数据的时间，就需要向后调整；
-        # 如果当前数据时间没有大于主数据的时间，并且数据还是ticks数据的话，就需要对当前数据进行填充数据
-        # 如果主数据是None的话，并且数据还是ticks数据的话，就需要对当天数据进行填充数据
+        # 如果主data_folder不是None，如果当前data_folder的时间大于了主data_folder的时间，就需要向后调整；
+        # 如果当前data_folder时间没有大于主data_folder的时间，并且data_folder还是ticksdata_folder的话，就需要对当前data_folder进行填充data_folder
+        # 如果主data_folder是None的话，并且data_folder还是ticksdata_folder的话，就需要对当天data_folder进行填充data_folder
         if datamaster is not None:
             if self.lines.datetime[0] > datamaster.lines.datetime[0]:
                 self.rewind()
@@ -415,7 +415,7 @@ class AbstractDataBase(with_metaclass(MetaAbstractDataBase,
         # 说明当前有一个bar
         return True
 
-    # 预先加载数据
+    # 预先加载data_folder
     def preload(self):
         while self.load():
             pass
@@ -449,17 +449,17 @@ class AbstractDataBase(with_metaclass(MetaAbstractDataBase,
                 continue
             ff.check(self, _forcedata=forcedata, *fargs, **fkwargs)
 
-    # 加载数据
+    # 加载data_folder
     def load(self):
         while True:
-            # 把数据指针向前移动一位
+            # 把data_folder指针向前移动一位
             self.forward()
 
-            # 如果已经从self._barstack中获取了数据，保存到了line中，就直接返回True
+            # 如果已经从self._barstack中获取了data_folder，保存到了line中，就直接返回True
             if self._fromstack():  
                 return True
 
-            # 如果从self._barstash中获取不了数据，那么，就运行下面的代码
+            # 如果从self._barstash中获取不了data_folder，那么，就运行下面的代码
             if not self._fromstack(stash=True):
                 # _load()返回的是False,下面的代码必然运行，但是似乎不用调用这个函数，也不用对下面进行判断，这两个语句似乎是多余的
                 _loadret = self._load()
@@ -483,7 +483,7 @@ class AbstractDataBase(with_metaclass(MetaAbstractDataBase,
             if dt < self.fromdate:
                 self.backwards()
                 continue
-            # 如果时间大于结束时间，向后退并撤销数据指针，并break
+            # 如果时间大于结束时间，向后退并撤销data_folder指针，并break
             if dt > self.todate:
                 self.backwards(force=True)
                 break
@@ -517,14 +517,14 @@ class AbstractDataBase(with_metaclass(MetaAbstractDataBase,
     def _load(self):
         return False
 
-    # 把bar的数据添加到self._barstack或者self._barstash中
+    # 把bar的data_folder添加到self._barstack或者self._barstash中
     def _add2stack(self, bar, stash=False):
         if not stash:
             self._barstack.append(bar)
         else:
             self._barstash.append(bar)
 
-    # 获取bar的数据，保存到self._barstack或者self._barstash，并且提供了参数，可以删除bar
+    # 获取bar的data_folder，保存到self._barstack或者self._barstash，并且提供了参数，可以删除bar
     def _save2stack(self, erase=False, force=False, stash=False):
         bar = [line[0] for line in self.itersize()]
         if not stash:
@@ -535,7 +535,7 @@ class AbstractDataBase(with_metaclass(MetaAbstractDataBase,
         if erase:  
             self.backwards(force=force)
 
-    # 这个注释有问题，这个函数是用于把bar的数据更新到具体的line上
+    # 这个注释有问题，这个函数是用于把bar的data_folder更新到具体的line上
     def _updatebar(self, bar, forward=False, ago=0):
         if forward:
             self.forward()
@@ -543,19 +543,19 @@ class AbstractDataBase(with_metaclass(MetaAbstractDataBase,
         for line, val in zip(self.itersize(), bar):
             line[0 + ago] = val
 
-    # 从self._barstack或者self._barstash获取数据，然后保存到line中，如果成功，就返回True，如果不成功，返回False
+    # 从self._barstack或者self._barstash获取data_folder，然后保存到line中，如果成功，就返回True，如果不成功，返回False
     def _fromstack(self, forward=False, stash=False):
 
         # 当stash是False的时候，coll等于self._barstack,否则就是self._barstash
         coll = self._barstack if not stash else self._barstash
 
-        # 如果coll是有数据的
+        # 如果coll是有data_folder的
         if coll:
             # 如果forward是True的话，就调用forward
             if forward:
                 self.forward()
 
-            # 给line增加数据
+            # 给line增加data_folder
             for line, val in zip(self.itersize(), coll.popleft()):
                 line[0] = val
 
@@ -586,17 +586,17 @@ class FeedBase(with_metaclass(metabase.MetaParams, object)):
     def __init__(self):
         self.datas = list()
 
-    # 数据开始
+    # data_folder开始
     def start(self):
         for data in self.datas:
             data.start()
 
-    # 数据结束
+    # data_folder结束
     def stop(self):
         for data in self.datas:
             data.stop()
 
-    # 根据dataname获取数据，并把数据添加到self.datas中
+    # 根据dataname获取data_folder，并把data_folder添加到self.datas中
     def getdata(self, dataname, name=None, **kwargs):
         # 获取参数中的参数名称、value，并保存到关键字参数中(默认字典)
         for pname, pvalue in self.p._getitems():
@@ -623,7 +623,7 @@ class FeedBase(with_metaclass(metabase.MetaParams, object)):
 # CSVDataBase的元类，继承自DataBase，在postinit的时候，给_obj设置_name属性
 class MetaCSVDataBase(DataBase.__class__):
     def dopostinit(cls, _obj, *args, **kwargs):
-        # 如果参数中没有名字并且_name属性是空的话，从数据文件的名称得到一个具体的名字
+        # 如果参数中没有名字并且_name属性是空的话，从data_folder文件的名称得到一个具体的名字
         if not _obj.p.name and not _obj._name:
             _obj._name, _ = os.path.splitext(os.path.basename(_obj.p.dataname))
 
@@ -635,21 +635,21 @@ class MetaCSVDataBase(DataBase.__class__):
 
 class CSVDataBase(with_metaclass(MetaCSVDataBase, DataBase)):
 
-    # 数据默认是None
+    # data_folder默认是None
     f = None
     # 设置具体的参数
     params = (('headers', True), ('separator', ','),)
 
-    # 获取数据并简单处理
+    # 获取data_folder并简单处理
     def start(self):
         super(CSVDataBase, self).start()
 
-        # 如果数据是None的话
+        # 如果data_folder是None的话
         if self.f is None:
-            # 如果参数中dataname具有readline属性，那么就说明dataname是一个数据，直接f等于参数中的数据
+            # 如果参数中dataname具有readline属性，那么就说明dataname是一个data_folder，直接f等于参数中的data_folder
             if hasattr(self.p.dataname, 'readline'):
                 self.f = self.p.dataname
-            # 如果没有readline属性的话，说明dataname是一个地址，那么就根据这个地址打开文件，获取数据
+            # 如果没有readline属性的话，说明dataname是一个地址，那么就根据这个地址打开文件，获取data_folder
             else:
                 self.f = io.open(self.p.dataname, 'r')
 
@@ -657,17 +657,17 @@ class CSVDataBase(with_metaclass(MetaCSVDataBase, DataBase)):
         if self.p.headers:
             self.f.readline()  
 
-        # 每一行数据的分隔符
+        # 每一行data_folder的分隔符
         self.separator = self.p.separator
 
     def stop(self):
         super(CSVDataBase, self).stop()
-        # 如果数据文件不是None，就关闭文件，并设置成None
+        # 如果data_folder文件不是None，就关闭文件，并设置成None
         if self.f is not None:
             self.f.close()
             self.f = None
 
-    # 提前load数据
+    # 提前loaddata_folder
     def preload(self):
         while self.load():
             pass
@@ -678,9 +678,9 @@ class CSVDataBase(with_metaclass(MetaCSVDataBase, DataBase)):
         self.f.close()
         self.f = None
 
-    # 加载一行数据
+    # 加载一行data_folder
     def _load(self):
-        # 如果数据文件是None，返回False,如果读取不到line了，返回False,对line进行处理，调用_loadline进行加载
+        # 如果data_folder文件是None，返回False,如果读取不到line了，返回False,对line进行处理，调用_loadline进行加载
         if self.f is None:
             return False
 
@@ -693,7 +693,7 @@ class CSVDataBase(with_metaclass(MetaCSVDataBase, DataBase)):
         linetokens = line.split(self.separator)
         return self._loadline(linetokens)
 
-    # 获取下一行数据
+    # 获取下一行data_folder
     def _getnextline(self):
         # 这个函数和上一个很类似，只是上一个函数获取了linetokens多了一个_loadline的调用
         if self.f is None:
@@ -713,13 +713,13 @@ class CSVFeedBase(FeedBase):
     # 设置参数
     params = (('basepath', ''),) + CSVDataBase.params._gettuple()
 
-    # 获取数据
+    # 获取data_folder
     def _getdata(self, dataname, **kwargs):
         return self.DataCls(dataname=self.p.basepath + dataname,
                             **self.p._getkwargs())
 
 
-# 数据克隆
+# data_folder克隆
 class DataClone(AbstractDataBase):
     # _clone属性设置为True
     _clone = True
@@ -763,14 +763,14 @@ class DataClone(AbstractDataBase):
         self._preloading = False
 
     def _load(self):
-        # 如果准备preload的话，运行下面的代码，一点点copy具体的数据
+        # 如果准备preload的话，运行下面的代码，一点点copy具体的data_folder
         if self._preloading:
             self.data.advance()
-            # 如果当前的数据大于了数据的缓存的长度，返回False
+            # 如果当前的data_folder大于了data_folder的缓存的长度，返回False
             if len(self.data) > self.data.buflen():
                 return False
 
-            # 如果当前的数据长度没有大于缓存的数据长度，那么就设置line的数据为dline的数据
+            # 如果当前的data_folder长度没有大于缓存的data_folder长度，那么就设置line的data_folder为dline的data_folder
             for line, dline in zip(self.lines, self.data.lines):
                 line[0] = dline[0]
 

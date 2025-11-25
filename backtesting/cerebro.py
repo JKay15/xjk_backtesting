@@ -38,8 +38,8 @@ class Cerebro(with_metaclass(MetaParams, object)):
 
       - ``preload`` (default: ``True``)
 
-        # preload这个参数默认的是True，就意味着，在回测的时候，默认是先把数据加载之后传给cerebro，在内存中调用，
-        # 这个步骤导致的结果就是，加载数据会浪费一部分时间，但是，在回测的时候，速度会快一些，总体上的速度还是有所提高的
+        # preload这个参数默认的是True，就意味着，在回测的时候，默认是先把data_folder加载之后传给cerebro，在内存中调用，
+        # 这个步骤导致的结果就是，加载data_folder会浪费一部分时间，但是，在回测的时候，速度会快一些，总体上的速度还是有所提高的
         # 所以，建议这个值，使用默认值。
 
       - ``runonce`` (default: ``True``)
@@ -48,7 +48,7 @@ class Cerebro(with_metaclass(MetaParams, object)):
 
       - ``live`` (default: ``False``)
 
-        # 默认情况是False，意味着，如果我们没有给数据传入"islive"这个方法，默认的就是回测了。
+        # 默认情况是False，意味着，如果我们没有给data_folder传入"islive"这个方法，默认的就是回测了。
         # 如果把live设置成True了，那么，默认就会不使用preload 和 runonce,这样，一般回测速度就会变慢。
 
       - ``maxcpus`` (default: None -> all available cores)
@@ -78,13 +78,13 @@ class Cerebro(with_metaclass(MetaParams, object)):
       - ``exactbars`` (default: ``False``)
 
 
-        # 储存多少个K线的数据在记忆中
+        # 储存多少个K线的data_folder在记忆中
 
-        # 当exactbars的值是True或者是1的时候，只保存满足最小需求的K线的数据，这会取消preload,runonce,plotting
+        # 当exactbars的值是True或者是1的时候，只保存满足最小需求的K线的data_folder，这会取消preload,runonce,plotting
 
-        # 当exactbars的值是-1的时候，数据、指标、运算结果会保存下来，但是指标运算内的中间变量不会保存，这个会取消掉runonce
+        # 当exactbars的值是-1的时候，data_folder、指标、运算结果会保存下来，但是指标运算内的中间变量不会保存，这个会取消掉runonce
 
-        # 当exactbars的值是-2的时候，数据、指标、运算结果会保存下来，但是指标内的，指标间的变量，如果没有使用self进行保存，就会消失
+        # 当exactbars的值是-2的时候，data_folder、指标、运算结果会保存下来，但是指标内的，指标间的变量，如果没有使用self进行保存，就会消失
         # 可以验证下，-2的结果是否是对的
 
       - ``objcache`` (default: ``False``)
@@ -103,19 +103,19 @@ class Cerebro(with_metaclass(MetaParams, object)):
 
       - ``optdatas`` (default: ``True``)
 
-        # optdatas设置成True，如果preload和runonce也是True的话，数据的预加载将会只进行一次，在
+        # optdatas设置成True，如果preload和runonce也是True的话，data_folder的预加载将会只进行一次，在
         # 优化参数的时候，可以节省很多的时间
 
 
       - ``optreturn`` (default: ``True``)
 
         # optreturn,设置成True之后，在优化参数的时候，返回的结果中，只包含参数和analyzers,为了提高速度，
-        # 舍弃了数据，指标，observers,这可以提高优化的速度。
+        # 舍弃了data_folder，指标，observers,这可以提高优化的速度。
 
       - ``oldsync`` (default: ``False``)
 
-        # 当这个参数设置成False的时候，可以允许数据有不同的长度。如果想要返回旧版本那种，
-        # 用data0作为主数据的方式，就可以把这个参数设置成True
+        # 当这个参数设置成False的时候，可以允许data_folder有不同的长度。如果想要返回旧版本那种，
+        # 用data0作为主data_folder的方式，就可以把这个参数设置成True
 
       - ``tz`` (default: ``None``)
 
@@ -123,7 +123,7 @@ class Cerebro(with_metaclass(MetaParams, object)):
         # 如果忽略的话，tz就是None，就默认使用的是UTC时区
         # 如果是pytz的实例，是一个时区的话，就会把UTC时区转变为选定的新的时区
         # 如果是一个字符串，将会尝试转化为一个pytz实例
-        # 如果是一个整数，将会使用某个数据的时区作为时区，如0代表第一个加载进去的数据的时区
+        # 如果是一个整数，将会使用某个data_folder的时区作为时区，如0代表第一个加载进去的data_folder的时区
 
       - ``cheat_on_open`` (default: ``False``)
 
@@ -178,7 +178,7 @@ class Cerebro(with_metaclass(MetaParams, object)):
         self.stores = list()
         self.feeds = list()
         self.datas = list()
-        # 默认有序字典，根据名字保存数据
+        # 默认有序字典，根据名字保存data_folder
         self.datasbyname = collections.OrderedDict()
         self.strats = list()
         self.optcbs = list()  
@@ -230,7 +230,7 @@ class Cerebro(with_metaclass(MetaParams, object)):
     def add_order_history(self, orders, notify=True):
         '''
             增加order历史，orders是一个可迭代对象，每个元素是包含时间、大小、价格三个变量，还可以额外加入data变量
-            data可能是第一个数据，也可能是一个整数，代表在datas中的index,也可能是一个字符串，代表添加数据的名字
+            data可能是第一个data_folder，也可能是一个整数，代表在datas中的index,也可能是一个字符串，代表添加data_folder的名字
             notify如果设置的是True的话，cerebro中添加的第一个策略将会通知订单信息
         '''
         self._ohistory.append((orders, notify))
@@ -303,9 +303,9 @@ class Cerebro(with_metaclass(MetaParams, object)):
             
             pytz 实例: when将被解释为指定时区实例的本地时间。
             
-            data feed 实例: when将被解释为指定数据源实例的tz参数指定的本地时间。
+            data feed 实例: when将被解释为指定data_folder源实例的tz参数指定的本地时间。
             
-            注意：如果when是SESSION_START或SESSION_END且tzdata为None，系统中的第一个数据源（即self.data0）将用作查找会话时间的参考
+            注意：如果when是SESSION_START或SESSION_END且tzdata为None，系统中的第一个data_folder源（即self.data0）将用作查找会话时间的参考
             
             strats（默认值：False）还调用策略的notify_timer函数
             
@@ -396,7 +396,7 @@ class Cerebro(with_metaclass(MetaParams, object)):
     def addobserver(self, obscls, *args, **kwargs):
         self.observers.append((False, obscls, args, kwargs))
 
-    # 给每个数据都增加一个observer
+    # 给每个data_folder都增加一个observer
     def addobservermulti(self, obscls, *args, **kwargs):
         self.observers.append((True, obscls, args, kwargs))
 
@@ -429,7 +429,7 @@ class Cerebro(with_metaclass(MetaParams, object)):
     def adddatacb(self, callback):
         self.datacbs.append(callback)
 
-    # 数据信息通知
+    # data_folder信息通知
     def _datanotify(self):
         for data in self.datas:
             for notif in data.get_notifications():
@@ -438,24 +438,24 @@ class Cerebro(with_metaclass(MetaParams, object)):
                 for strat in self.runningstrats:
                     strat.notify_data(data, status, *args, **kwargs)
 
-    # 通知数据信息
+    # 通知data_folder信息
     def _notify_data(self, data, status, *args, **kwargs):
         for callback in self.datacbs:
             callback(data, status, *args, **kwargs)
 
         self.notify_data(data, status, *args, **kwargs)
 
-    # 通知数据信息
+    # 通知data_folder信息
     def notify_data(self, data, status, *args, **kwargs):
         pass
 
-    # 增加数据，这个是比较常用的功能
+    # 增加data_folder，这个是比较常用的功能
     def adddata(self, data, name=None):
         # 如果name不是None的话，就把name赋值给data._name
         if name is not None:
             data._name = name
 
-        # data._id每次增加一个数据，就会增加一个
+        # data._id每次增加一个data_folder，就会增加一个
         data._id = next(self._dataid)
         # 设置data的环境
         data.setenvironment(self)
@@ -471,13 +471,13 @@ class Cerebro(with_metaclass(MetaParams, object)):
             # 把feed追加到self.feeds中
             self.feeds.append(feed)
 
-        # 如果data是实时数据，把_dolive的值变为True
+        # 如果data是实时data_folder，把_dolive的值变为True
         if data.islive():
             self._dolive = True
 
         return data
 
-    # chaindata的使用方法，把几个数据拼接起来
+    # chaindata的使用方法，把几个data_folder拼接起来
     def chaindata(self, *args, **kwargs):
         dname = kwargs.pop('name', None)
         if dname is None:
@@ -487,7 +487,7 @@ class Cerebro(with_metaclass(MetaParams, object)):
 
         return d
 
-    # rollover的用法，满足一定条件之后，在不同数据之间切换
+    # rollover的用法，满足一定条件之后，在不同data_folder之间切换
     def rolloverdata(self, *args, **kwargs):
         dname = kwargs.pop('name', None)
         if dname is None:
@@ -603,12 +603,12 @@ class Cerebro(with_metaclass(MetaParams, object)):
     def runstop(self):
         self._event_stop = True  
         
-    # 执行回测的核心方法，任何传递的参数将会影响其中的标准参数，如果没有添加数据，将会立即停止
+    # 执行回测的核心方法，任何传递的参数将会影响其中的标准参数，如果没有添加data_folder，将会立即停止
     # 根据是否是优化参数，返回的结果不同def run(self, **kwargs):
     def run(self, **kwargs):
         self._event_stop = False 
         
-        # 如果没有数据，直接返回空的列表
+        # 如果没有data_folder，直接返回空的列表
         if not self.datas:
             return []  
 
@@ -634,7 +634,7 @@ class Cerebro(with_metaclass(MetaParams, object)):
             self._dorunonce = False  
             self._dopreload = self._dopreload and self._exactbars < 1
 
-        # 如果_doreplay是True或者数据中有任何一个具有replaying属性值是True的话，就把_doreplay设置成True
+        # 如果_doreplay是True或者data_folder中有任何一个具有replaying属性值是True的话，就把_doreplay设置成True
         self._doreplay = self._doreplay or any(x.replaying for x in self.datas)
         # 如果_doreplay,需要把_dopreload设置成False
         if self._doreplay:
@@ -710,9 +710,9 @@ class Cerebro(with_metaclass(MetaParams, object)):
         else:
             # 如果optdatas是True,并且_dopreload，并且_dorunonce
             if self.p.optdatas and self._dopreload and self._dorunonce:
-                # 遍历每个data,进行reset,如果_exactbars小于1，对数据进行extend处理
-                # 开始数据
-                # 如果数据_dopreload的话，对数据调用preload
+                # 遍历每个data,进行reset,如果_exactbars小于1，对data_folder进行extend处理
+                # 开始data_folder
+                # 如果data_folder_dopreload的话，对data_folder调用preload
                 for data in self.datas:
                     data.reset()
                     if self._exactbars < 1:  
@@ -731,7 +731,7 @@ class Cerebro(with_metaclass(MetaParams, object)):
             # 关闭进程词
             pool.close()
 
-            # 如果optdatas是True,并且_dopreload，并且_dorunonce，遍历数据，并停止数据
+            # 如果optdatas是True,并且_dopreload，并且_dorunonce，遍历data_folder，并停止data_folder
             if self.p.optdatas and self._dopreload and self._dorunonce:
                 for data in self.datas:
                     data.stop()
@@ -781,10 +781,10 @@ class Cerebro(with_metaclass(MetaParams, object)):
         for feed in self.feeds:
             feed.start()
 
-        # 如果需要保存writer中的数据
+        # 如果需要保存writer中的data_folder
         if self.writers_csv:
             wheaders = list()
-            # 遍历数据，如果数据的csv属性值是True的话，获取数据中的需要保存的headers
+            # 遍历data_folder，如果data_folder的csv属性值是True的话，获取data_folder中的需要保存的headers
             for data in self.datas:
                 if data.csv:
                     wheaders.extend(data.getwriterheaders())
@@ -794,7 +794,7 @@ class Cerebro(with_metaclass(MetaParams, object)):
                 if writer.p.csv:
                     writer.addheaders(wheaders)
 
-        # 如果没有predata的话，需要提前预处理数据，和run中预处理数据的方法很相似
+        # 如果没有predata的话，需要提前预处理data_folder，和run中预处理data_folder的方法很相似
         if not predata:
             for data in self.datas:
                 data.reset()
@@ -806,7 +806,7 @@ class Cerebro(with_metaclass(MetaParams, object)):
 
         # 循环策略
         for stratcls, sargs, skwargs in iterstrat:
-            # 把数据添加到策略参数
+            # 把data_folder添加到策略参数
             sargs = self.datas + list(sargs)
             # 实例化策略
             try:
@@ -814,10 +814,10 @@ class Cerebro(with_metaclass(MetaParams, object)):
             except bt.errors.StrategySkipError:
                 continue  
 
-            # 旧的数据同步方法
+            # 旧的data_folder同步方法
             if self.p.oldsync:
                 strat._oldsync = True  
-            # 是否保存交易历史数据
+            # 是否保存交易历史data_folder
             if self.p.tradehistory:
                 strat.set_tradehistory()
             # 添加策略
@@ -873,14 +873,14 @@ class Cerebro(with_metaclass(MetaParams, object)):
                 # 策略开始
                 strat._start()
 
-                # 对于正在运行的writer来说，如果csv参数是True的话，把策略中需要保存的数据保存到writer中
+                # 对于正在运行的writer来说，如果csv参数是True的话，把策略中需要保存的data_folder保存到writer中
                 for writer in self.runwriters:
                     if writer.p.csv:
                         writer.addheaders(strat.getwriterheaders())
 
-            # 如果predata是False，没有提前加载数据
+            # 如果predata是False，没有提前加载data_folder
             if not predata:
-                # 循环每个策略，调用qbuffer缓存数据
+                # 循环每个策略，调用qbuffer缓存data_folder
                 for strat in runstrats:
                     strat.qbuffer(self._exactbars, replaying=self._doreplay)
 
@@ -904,14 +904,14 @@ class Cerebro(with_metaclass(MetaParams, object)):
 
             # 如果_dopreload 和 _dorunonce是True的话
             if self._dopreload and self._dorunonce:
-                # 如果是旧的数据对齐和同步方式，使用_runonce_old，否则使用_runonce
+                # 如果是旧的data_folder对齐和同步方式，使用_runonce_old，否则使用_runonce
                 if self.p.oldsync:
                     self._runonce_old(runstrats)
                 else:
                     self._runonce(runstrats)
             # 如果_dopreload 和 _dorunonce并不都是True的话
             else:
-                # 如果是旧的数据对齐和同步方式，使用_runnext_old，否则使用_runnext
+                # 如果是旧的data_folder对齐和同步方式，使用_runnext_old，否则使用_runnext
                 if self.p.oldsync:
                     self._runnext_old(runstrats)
                 else:
@@ -924,7 +924,7 @@ class Cerebro(with_metaclass(MetaParams, object)):
         # 停止broker
         self._broker.stop()
 
-        # 如果predata是False的话，遍历数据并停止每个数据
+        # 如果predata是False的话，遍历data_folder并停止每个data_folder
         if not predata:
             for data in self.datas:
                 data.stop()
@@ -963,7 +963,7 @@ class Cerebro(with_metaclass(MetaParams, object)):
         cerebroinfo = OrderedDict()
         datainfos = OrderedDict()
 
-        # 获取每个数据的信息，保存到datainfos中，然后保存到cerebroinfo
+        # 获取每个data_folder的信息，保存到datainfos中，然后保存到cerebroinfo
         for i, data in enumerate(self.datas):
             datainfos['Data%d' % i] = data.getwriterinfo()
 
@@ -1099,12 +1099,12 @@ class Cerebro(with_metaclass(MetaParams, object)):
         self._dorunonce = False
 
     def _runnext(self, runstrats):
-        # 对数据的时间周期进行排序
+        # 对data_folder的时间周期进行排序
         datas = sorted(self.datas,
                        key=lambda x: (x._timeframe, x._compression))
-        # 其他数据
+        # 其他data_folder
         datas1 = datas[1:]
-        # 主数据
+        # 主data_folder
         data0 = datas[0]
         d0ret = True
 
@@ -1116,22 +1116,22 @@ class Cerebro(with_metaclass(MetaParams, object)):
                   if x.resampling and not x.replaying]
         # 仅仅只做resample,不做replay得index
         onlyresample = len(datas) == len(rsonly)
-        # 判断是否没有需要resample的数据
+        # 判断是否没有需要resample的data_folder
         noresample = not rsonly
 
-        # 克隆的数据量
+        # 克隆的data_folder量
         clonecount = sum(d._clone for d in datas)
-        # 数据的数量
+        # data_folder的数量
         ldatas = len(datas)
-        # 没有克隆的数据量
+        # 没有克隆的data_folder量
         ldatas_noclones = ldatas - clonecount
         lastqcheck = False
         # 默认dt0在最大时间
         dt0 = date2num(datetime.datetime.max) - 2  
         while d0ret or d0ret is None:
-            # 如果有任何实时数据的话，newqcheck是False
+            # 如果有任何实时data_folder的话，newqcheck是False
             newqcheck = not any(d.haslivedata() for d in datas)
-            # 如果存在实时数据
+            # 如果存在实时data_folder
             if not newqcheck:
                 livecount = sum(d._laststatus == d.LIVE for d in datas)
                 newqcheck = not livecount or livecount == ldatas_noclones
@@ -1173,7 +1173,7 @@ class Cerebro(with_metaclass(MetaParams, object)):
                     dt0 = min((d for i, d in enumerate(dts)
                                if d is not None and i not in rsonly))
 
-                # 获取主数据，及时间
+                # 获取主data_folder，及时间
                 dmaster = datas[dts.index(dt0)]  
                 self._dtmaster = dmaster.num2date(dt0)
                 self._udtmaster = num2date(dt0)
@@ -1183,7 +1183,7 @@ class Cerebro(with_metaclass(MetaParams, object)):
                     if ret:  
                         continue
 
-                    # 获取数据，并尝试给dts设置时间
+                    # 获取data_folder，并尝试给dts设置时间
                     d = datas[i]
                     d._check(forcedata=dmaster)  
                     if d.next(datamaster=dmaster, ticks=False): 
@@ -1194,7 +1194,7 @@ class Cerebro(with_metaclass(MetaParams, object)):
                 for i, dti in enumerate(dts):
                     # 如果dti不是None
                     if dti is not None:
-                        # 获取数据
+                        # 获取data_folder
                         di = datas[i]
                         rpi = False and di.replaying   
                         if dti > dt0:
@@ -1204,7 +1204,7 @@ class Cerebro(with_metaclass(MetaParams, object)):
                             di._tick_fill(force=True)
 
 
-            # 如果d0ret是None的话，遍历每个数据，调用_check()
+            # 如果d0ret是None的话，遍历每个data_folder，调用_check()
             elif d0ret is None:
                 for data in datas:
                     data._check()
@@ -1217,7 +1217,7 @@ class Cerebro(with_metaclass(MetaParams, object)):
                 if not lastret:
                     break
 
-            # 通知数据信息
+            # 通知data_folder信息
             self._datanotify()
             if self._event_stop:  
                 return
@@ -1246,7 +1246,7 @@ class Cerebro(with_metaclass(MetaParams, object)):
 
                     self._next_writers(runstrats)
 
-        # 通知数据信息
+        # 通知data_folder信息
         self._datanotify()
         if self._event_stop:  
             return
@@ -1263,12 +1263,12 @@ class Cerebro(with_metaclass(MetaParams, object)):
             strat.reset()  
 
 
-        # 对数据进行排序，从小周期开始到大周期
+        # 对data_folder进行排序，从小周期开始到大周期
         datas = sorted(self.datas,
                        key=lambda x: (x._timeframe, x._compression))
 
         while True:
-            # 对于每个数据调用advance_peek(),取得最小的一个时间作为第一个
+            # 对于每个data_folder调用advance_peek(),取得最小的一个时间作为第一个
             dts = [d.advance_peek() for d in datas]
             dt0 = min(dts)
             if dt0 == float('inf'):
@@ -1276,7 +1276,7 @@ class Cerebro(with_metaclass(MetaParams, object)):
 
             # 第一个策略现在的长度slen
             slen = len(runstrats[0])
-            # 对于每个数据的时间，如果时间小于即将到来的最小的时间，数据向前一位，否则，忽略
+            # 对于每个data_folder的时间，如果时间小于即将到来的最小的时间，data_folder向前一位，否则，忽略
             for i, dti in enumerate(dts):
                 if dti <= dt0:
                     datas[i].advance()

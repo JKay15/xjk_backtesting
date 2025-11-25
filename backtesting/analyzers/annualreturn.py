@@ -87,9 +87,9 @@ class MyAnnualReturn(Analyzer):
     '''
 
     def stop(self):
-        # 保存数据的容器---字典
+        # 保存data_folder的容器---字典
         self.ret =OrderedDict()
-        # 获取数据的时间，并转化为date
+        # 获取data_folder的时间，并转化为date
         dt_list = self.data.datetime.get(0, size=len(self.data))
         dt_list =[num2date(i) for i in dt_list]
         # 获取账户的资产

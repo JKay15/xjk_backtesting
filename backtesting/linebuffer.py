@@ -19,8 +19,8 @@ class LineBuffer(LineSingle):
     LineBuffer主要是用于定义一个操作array.array的接口，
     在调用line[0]的时候得到的是当前输入输出的活跃值，
     如果是在next中调用，line[0]就代表着当前时间点的值
-    索引0指向系统当前正在处理的数据，而索引1和-1分别指向系统当前正在处理数据的后一个和前一个数据
-    在这种数据处理策略下，我们只需要关注当前正在处理数据的相对位置，而无需在代码中显式地进行索引位置的转换，
+    索引0指向系统当前正在处理的data_folder，而索引1和-1分别指向系统当前正在处理data_folder的后一个和前一个data_folder
+    在这种data_folder处理策略下，我们只需要关注当前正在处理data_folder的相对位置，而无需在代码中显式地进行索引位置的转换，
     这更符合人类的直觉，同时也让代码更加直观易读
     '''
     # LineBuffer对象有两种模式：Unbounded和QBuffer，分别对应数组模式和队列模式
@@ -36,7 +36,7 @@ class LineBuffer(LineSingle):
         self.reset() # 重置，调用的是自身的reset方法
         self._tz = None # 时区设置
 
-    # 获取_idx的值——系统正在处理的数据的索引
+    # 获取_idx的值——系统正在处理的data_folder的索引
     def get_idx(self):
         return self._idx
 
@@ -54,14 +54,14 @@ class LineBuffer(LineSingle):
 
     def reset(self):
         ''' 
-        LineBuffer对象的实例属性array代表底层数据容器
+        LineBuffer对象的实例属性array代表底层data_folder容器
         在数组模式下，实例属性array是一个双精度浮点型数组array.array('d')
         在队列模式下，实例属性array是一个限定了最大长度的双端队列collection.deque(maxlen = ...)
         '''
-        # 如果是缓存模式，保存的数据量是一定的，就会使用deque来保存数据，有一个最大的长度，超过这个长度的时候回踢出最前面的数据
+        # 如果是缓存模式，保存的data_folder量是一定的，就会使用deque来保存data_folder，有一个最大的长度，超过这个长度的时候回踢出最前面的data_folder
         # 参数exactbars的默认值为False，
-        # 如果将其设置为True，那么该Engine对象下的所有底层数据容器都将从数组转换为双端队列，且双端队列的参数maxlen将设置为最小周期 (minperiod)
-        # 最小周期指的是计算指标所需要的最小数据数量
+        # 如果将其设置为True，那么该Engine对象下的所有底层data_folder容器都将从数组转换为双端队列，且双端队列的参数maxlen将设置为最小周期 (minperiod)
+        # 最小周期指的是计算指标所需要的最小data_folder数量
         if self.mode == self.QBuffer:
             self.array = collections.deque(maxlen=self.maxlen + self.extrasize)
             self.useislice = True
@@ -108,21 +108,21 @@ class LineBuffer(LineSingle):
     def __len__(self):
         return self.lencount
 
-    # 返回line缓存的数据的长度
+    # 返回line缓存的data_folder的长度
     def buflen(self):
         '''
-        缓存的数据的实际长度
+        缓存的data_folder的实际长度
 
-        内部的缓存可能比实际存储的数据要长，这是为了允许"lookahead"操作
-        返回的长度是实际存储的数据的长度
+        内部的缓存可能比实际存储的data_folder要长，这是为了允许"lookahead"操作
+        返回的长度是实际存储的data_folder的长度
         '''
         return len(self.array) - self.extension
 
-    # 获取值——无论是取值还是赋值，索引0都指向指针位置处的数据
+    # 获取值——无论是取值还是赋值，索引0都指向指针位置处的data_folder
     def __getitem__(self, ago):
         return self.array[self.idx + ago]
 
-    # 获取数据的值，在策略中使用还是比较广泛的
+    # 获取data_folder的值，在策略中使用还是比较广泛的
     def get(self, ago=0, size=1):
         ''' 
         返回一个相对于指针位置的切片
@@ -133,7 +133,7 @@ class LineBuffer(LineSingle):
         如果size是正数，返回的是ago到ago+size的切片，如果size是负数，返回的是ago到ago-size的切片
 
         返回值：
-            底层数据容器的切片
+            底层data_folder容器的切片
         '''
         # 是否使用切片，如果使用按照下面的语法
         if self.useislice:
@@ -158,7 +158,7 @@ class LineBuffer(LineSingle):
         '''
         return self.array[idx]
 
-    # 返回array从idx开始，size个长度的数据
+    # 返回array从idx开始，size个长度的data_folder
     def getzero(self, idx=0, size=1):
         ''' 
         返回一个相对于0处的切片
@@ -175,7 +175,7 @@ class LineBuffer(LineSingle):
 
         return self.array[idx:idx + size]
 
-    # 给array相关的值——无论是取值还是赋值，索引0都指向指针位置处的数据
+    # 给array相关的值——无论是取值还是赋值，索引0都指向指针位置处的data_folder
     def __setitem__(self, ago, value):
         ''' 
         在距离指针位置ago的位置设置一个值，并且执行任何相关的绑定
@@ -206,7 +206,7 @@ class LineBuffer(LineSingle):
         ''' 
         返回到最开始
 
-        只调整了指针的位置，没有调整底层数据容器的内容，可以通过buflen找到最后一个数据的位置
+        只调整了指针的位置，没有调整底层data_folder容器的内容，可以通过buflen找到最后一个data_folder的位置
         '''
         self.idx = -1
         self.lencount = 0
@@ -214,15 +214,15 @@ class LineBuffer(LineSingle):
     # 向前移动一位
     def forward(self, value=NAN, size=1):
         ''' 
-        在默认情况下，forward方法会向底层容器array添加一个"nan"元素，并且将指针位置idx向右移动一位，同时已处理的数据数量lencount加一
+        在默认情况下，forward方法会向底层容器array添加一个"nan"元素，并且将指针位置idx向右移动一位，同时已处理的data_folder数量lencount加一
 
         参数:
             value (variable): 要设置的值
             size (int): 缓冲区增加的大小
         '''
         self.idx += size
-        # 实例属性lencount代表已处理数据数量
-        # 初始状态下，底层数据容器array为空数组，对应idx值为-1，lencount值为0
+        # 实例属性lencount代表已处理data_folder数量
+        # 初始状态下，底层data_folder容器array为空数组，对应idx值为-1，lencount值为0
         self.lencount += size
 
         for i in range(size):
@@ -230,7 +230,7 @@ class LineBuffer(LineSingle):
 
     def backwards(self, size=1, force=False):
         ''' 
-        在默认情况下，backwards方法会删除底层容器array中的最后一个元素，并将指针位置idx向左移动一位，同时已处理的数据数量lencount减一
+        在默认情况下，backwards方法会删除底层容器array中的最后一个元素，并将指针位置idx向左移动一位，同时已处理的data_folder数量lencount减一
 
         参数:
             size (int): 缓冲区减少的大小
@@ -248,7 +248,7 @@ class LineBuffer(LineSingle):
 
     def advance(self, size=1):
         ''' 
-        在不改变底层数据容器array的情况下，将指针位置idx向右移动size位，同时已处理的数据数量lencount加size
+        在不改变底层data_folder容器array的情况下，将指针位置idx向右移动size位，同时已处理的data_folder数量lencount加size
 
         参数:
             size (int): 指针位置idx向右移动的位数
@@ -284,7 +284,7 @@ class LineBuffer(LineSingle):
         
         binding.updateminperiod(self._minperiod)
 
-    # 获取从idx开始的全部数据
+    # 获取从idx开始的全部data_folder
     def plot(self, idx=0, size=None):
         ''' 
         返回一个从idx开始到最后的切片
@@ -299,7 +299,7 @@ class LineBuffer(LineSingle):
         '''
         return self.getzero(idx, size or len(self))
 
-    # 获取array的部分数据
+    # 获取array的部分data_folder
     def plotrange(self, start, end):
         if self.useislice:
             return list(islice(self.array, start, end))
@@ -395,50 +395,50 @@ class LineBuffer(LineSingle):
         '''
         return time2num(num2date(self.array[self.idx + ago]).time())
 
-    # 对比数据中的日期-时间是否小于数据中的日期+other的大小
+    # 对比data_folder中的日期-时间是否小于data_folder中的日期+other的大小
     def tm_lt(self, other, ago=0):
         '''
-        返回对比数据中的日期-时间是否小于数据中的日期+other的大小
+        返回对比data_folder中的日期-时间是否小于data_folder中的日期+other的大小
         '''
         dtime = self.array[self.idx + ago]
         tm, dt = math.modf(dtime)
 
         return dtime < (dt + other)
 
-    # 对比数据中的日期-时间是否小于等于数据中的日期+other的大小
+    # 对比data_folder中的日期-时间是否小于等于data_folder中的日期+other的大小
     def tm_le(self, other, ago=0):
         '''
-        返回对比数据中的日期-时间是否小于等于数据中的日期+other的大小
+        返回对比data_folder中的日期-时间是否小于等于data_folder中的日期+other的大小
         '''
         dtime = self.array[self.idx + ago]
         tm, dt = math.modf(dtime)
 
         return dtime <= (dt + other)
 
-    # 对比数据中的日期-时间是否等于数据中的日期+other的大小
+    # 对比data_folder中的日期-时间是否等于data_folder中的日期+other的大小
     def tm_eq(self, other, ago=0):
         '''
-        返回对比数据中的日期-时间是否等于数据中的日期+other的大小
+        返回对比data_folder中的日期-时间是否等于data_folder中的日期+other的大小
         '''
         dtime = self.array[self.idx + ago]
         tm, dt = math.modf(dtime)
 
         return dtime == (dt + other)
 
-    # 对比数据中的日期-时间是否大于数据中的日期+other的大小
+    # 对比data_folder中的日期-时间是否大于data_folder中的日期+other的大小
     def tm_gt(self, other, ago=0):
         '''
-        返回对比数据中的日期-时间是否大于数据中的日期+other的大小
+        返回对比data_folder中的日期-时间是否大于data_folder中的日期+other的大小
         '''
         dtime = self.array[self.idx + ago]
         tm, dt = math.modf(dtime)
 
         return dtime > (dt + other)
 
-    # 对比数据中的日期-时间是否大于等于数据中的日期+other的大小
+    # 对比data_folder中的日期-时间是否大于等于data_folder中的日期+other的大小
     def tm_ge(self, other, ago=0):
         '''
-        返回对比数据中的日期-时间是否大于等于数据中的日期+other的大小
+        返回对比data_folder中的日期-时间是否大于等于data_folder中的日期+other的大小
         '''
         dtime = self.array[self.idx + ago]
         tm, dt = math.modf(dtime)
@@ -639,9 +639,9 @@ def LineNum(num):
 
 class _LineDelay(LineActions):
     '''
-    对LineBuffer对象或者其子类操作，在delay数据的时候能够有效的保存ago周期前的数据
+    对LineBuffer对象或者其子类操作，在delaydata_folder的时候能够有效的保存ago周期前的data_folder
     '''
-    # 对LineBuffer对象或者其子类操作，在delay数据的时候能够有效的保存ago周期前的数据
+    # 对LineBuffer对象或者其子类操作，在delaydata_folder的时候能够有效的保存ago周期前的data_folder
     def __init__(self, a, ago):
         super(_LineDelay, self).__init__()
         self.a = a
@@ -653,7 +653,7 @@ class _LineDelay(LineActions):
         self[0] = self.a[self.ago]
 
     def once(self, start, end):
-        # 调用once的时候，根据a的数据,生成对应的ago前的数据形成的array
+        # 调用once的时候，根据a的data_folder,生成对应的ago前的data_folder形成的array
         dst = self.array
         src = self.a.array
         ago = self.ago
@@ -709,7 +709,7 @@ class LinesOperation(LineActions):
             self.a, self.b = b, a
 
     def next(self):
-        # 对line的所有数据进行操作
+        # 对line的所有data_folder进行操作
         # 如果a和b都是line
         if self.bline:
             self[0] = self.operation(self.a[0], self.b[0])
@@ -726,7 +726,7 @@ class LinesOperation(LineActions):
             self[0] = self.operation(self.a, self.b[0])
 
     def once(self, start, end):
-        # 对line的部分数据进行操作
+        # 对line的部分data_folder进行操作
         # 如果b是line，就调用_once_op函数
         if self.bline:
             self._once_op(start, end)
@@ -796,11 +796,11 @@ class LineOwnOperation(LineActions):
         self.a = a
 
     def next(self):
-        # 对line的所有数据进行操作
+        # 对line的所有data_folder进行操作
         self[0] = self.operation(self.a[0])
 
     def once(self, start, end):
-        # 对line的一部分数据进行操作
+        # 对line的一部分data_folder进行操作
         dst = self.array
         srca = self.a.array
         op = self.operation

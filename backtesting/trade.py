@@ -195,7 +195,7 @@ class Trade(object):
 
     __nonzero__ = __bool__
 
-    # 返回数据的名称
+    # 返回data_folder的名称
     def getdataname(self):
         return self.data._name
     # 返回开仓时间

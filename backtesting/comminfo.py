@@ -271,7 +271,7 @@ class CommInfoBase(with_metaclass(MetaParams)):
           公式: ``days * price * abs(size) * (interest / 365)``
 
         参数:
-          - ``data``: 要计算利息的数据源
+          - ``data``: 要计算利息的data_folder源
 
           - ``size``: 当前持仓大小。对于多头仓位，``size > 0``；对于空头仓位，``size < 0``（此参数不会为``0``）
 

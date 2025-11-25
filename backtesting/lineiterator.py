@@ -87,10 +87,10 @@ class MetaLineIterator(LineSeries.__class__):
         _obj, args, kwargs = \
             super(MetaLineIterator, cls).dopreinit(_obj, *args, **kwargs)
 
-        # 如果没有数据被使用到，为了能够有一个时间，使用_obj._owner
+        # 如果没有data_folder被使用到，为了能够有一个时间，使用_obj._owner
         _obj.datas = _obj.datas or [_obj._owner]
 
-        # 第一个数据是我们的基准数据，用作时钟，每次next进入下一个
+        # 第一个data_folder是我们的基准data_folder，用作时钟，每次next进入下一个
         _obj._clock = _obj.datas[0]
 
         # 获取_obj的最小周期
@@ -121,7 +121,7 @@ class MetaLineIterator(LineSeries.__class__):
 class LineIterator(with_metaclass(MetaLineIterator, LineSeries)):
     # _nextforce默认是False
     _nextforce = False  
-    # 最小的数据数目是1
+    # 最小的data_folder数目是1
     _mindatas = 1
     # _ltype代表line的index的值，目前默认应该是0
     _ltype = LineSeries.IndType
@@ -238,7 +238,7 @@ class LineIterator(with_metaclass(MetaLineIterator, LineSeries)):
 
     def _next(self):
         # _next方法
-        # 当前时间数据的长度
+        # 当前时间data_folder的长度
         clock_len = self._clk_update()
         # indicator调用_next
         for indicator in self._lineiterators[LineIterator.IndType]:
@@ -345,7 +345,7 @@ class LineIterator(with_metaclass(MetaLineIterator, LineSeries)):
 
 
 class DataAccessor(LineIterator):
-    # 数据接口类
+    # data_folder接口类
     PriceClose = DataSeries.Close
     PriceLow = DataSeries.Low
     PriceHigh = DataSeries.High

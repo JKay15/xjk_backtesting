@@ -349,7 +349,7 @@ class OrderBase(with_metaclass(MetaParams, object)):
             price = pclose
         else:
             price = self.price
-        # 如果不是simulated的话，订单创建时间等于当前数据的时间，否则就是0
+        # 如果不是simulated的话，订单创建时间等于当前data_folder的时间，否则就是0
         dcreated = self.data.datetime[0] if not self.p.simulated else 0.0
         # 订单创建
         self.created = OrderData(dt=dcreated,
@@ -562,7 +562,7 @@ class OrderBase(with_metaclass(MetaParams, object)):
 # 订单类
 class Order(OrderBase):
     '''
-    订单类用于保存订单创建、执行数据和订单类型
+    订单类用于保存订单创建、执行data_folder和订单类型
     Class which holds creation/execution data and type of oder.
     # 订单可能有下面的一些状态
     The order may have the following status:
@@ -592,9 +592,9 @@ class Order(OrderBase):
     Member Attributes:
         # order的id
       - ref: unique order identifier
-        # 创建的数据
+        # 创建的data_folder
       - created: OrderData holding creation data
-        # 执行的数据
+        # 执行的data_folder
       - executed: OrderData holding execution data
         # 订单的信息
       - info: custom information passed over method :func:`addinfo`. It is kept

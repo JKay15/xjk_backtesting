@@ -21,7 +21,7 @@ class Sizer(with_metaclass(MetaParams, object)):
         # 这个方法在使用的 时候需要被重写，传入四个参数：
         # comminfo  代表佣金的实例，可以用于获取佣金等信息
         # cash      代表当前可以使用的现金
-        # data      代表在那个数据上进行交易
+        # data      代表在那个data_folder上进行交易
         # isbuy     代表在buy操作的时候是True，sell的时候代表是False
 
         '''

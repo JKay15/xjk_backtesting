@@ -95,8 +95,8 @@ class DataSeries(LineSeries):
 
         return info
 
-# 数据线最为重要的信息是它的名称。 在使用backtrader时，我们通常会同时处理多根数据线，这就需要通过名称进行区分和标识
-# 用户可以通过类变量lines来提供数据线的名称
+# data_folder线最为重要的信息是它的名称。 在使用backtrader时，我们通常会同时处理多根data_folder线，这就需要通过名称进行区分和标识
+# 用户可以通过类变量lines来提供data_folder线的名称
 class OHLC(DataSeries):
     # 继承DataSeries，lines剔除了datetime只剩下6条
     lines = ('close', 'low', 'high', 'open', 'volume', 'openinterest',)
@@ -108,7 +108,7 @@ class OHLCDateTime(OHLC):
 
 
 class SimpleFilterWrapper(object):
-    # 这是一个增加过滤器的类，可以根据过滤器的需要对数据进行一定的操作比如去除
+    # 这是一个增加过滤器的类，可以根据过滤器的需要对data_folder进行一定的操作比如去除
     # 这个过滤器通常是类或者是函数
     def __init__(self, data, ffilter, *args, **kwargs):
         if inspect.isclass(ffilter):

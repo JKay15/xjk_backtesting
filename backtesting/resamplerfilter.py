@@ -11,7 +11,7 @@ class DTFaker(object):
    
     # 初始化
     def __init__(self, data, forcedata=None):
-        # 数据
+        # data_folder
         self.data = data
 
         self.datetime = self
@@ -19,7 +19,7 @@ class DTFaker(object):
 
         # 如果forcedata是None的话
         if forcedata is None:
-            # 获取现在的utc时间，并且加上数据的时间补偿
+            # 获取现在的utc时间，并且加上data_folder的时间补偿
             _dtime = datetime.utcnow() + data._timeoffset()
             # 把计算得到的utc时间转化成数字
             self._dt = dt = date2num(_dtime)  
@@ -53,7 +53,7 @@ class DTFaker(object):
     def time(self, idx=0):
         return self._dtime.time()
 
-    # 返回数据的日历
+    # 返回data_folder的日历
     @property
     def _calendar(self):
         return self.data._calendar
@@ -94,11 +94,11 @@ class _BaseResampler(with_metaclass(metabase.MetaParams, object)):
         self.subdays = TimeFrame.Ticks < self.p.timeframe < TimeFrame.Days
         # 如果时间周期小于周，subweeks就是True
         self.subweeks = self.p.timeframe < TimeFrame.Weeks
-        # 如果不是subdays，并且数据的时间周期等于参数的时间周期，并且参数的周期数除以数据周期数余数是0，componly是True
+        # 如果不是subdays，并且data_folder的时间周期等于参数的时间周期，并且参数的周期数除以data_folder周期数余数是0，componly是True
         self.componly = (not self.subdays and
                          data._timeframe == self.p.timeframe and
                          not (self.p.compression % data._compression))
-        # 创建一个对象，用于保存bar的数据
+        # 创建一个对象，用于保存bar的data_folder
         self.bar = _Bar(maxdate=True)  # bar holder
         # 产生的bar的数目，用于控制周期数
         self.compcount = 0  # count of produced bars to control compression
@@ -112,18 +112,18 @@ class _BaseResampler(with_metaclass(metabase.MetaParams, object)):
 
         # Modify data information according to own parameters
         # 初始化的时候，根据参数修改data的属性
-        # 数据的resampling是1
+        # data_folder的resampling是1
         data.resampling = 1
         # replaying等于replaying
         data.replaying = self.replaying
-        # 数据的时间周期等于参数的时间周期
+        # data_folder的时间周期等于参数的时间周期
         data._timeframe = self.p.timeframe
-        # 数据的周期数等于参数的周期数
+        # data_folder的周期数等于参数的周期数
         data._compression = self.p.compression
 
         self.data = data
 
-    # 晚到的数据怎么处理，如果不是subdays，返回False,如果data长度大于1并且现在时间小于等于上一个时间，返回True
+    # 晚到的data_folder怎么处理，如果不是subdays，返回False,如果data长度大于1并且现在时间小于等于上一个时间，返回True
     def _latedata(self, data):
         if not self.subdays:
             return False
@@ -132,7 +132,7 @@ class _BaseResampler(with_metaclass(metabase.MetaParams, object)):
 
     # 是否检查bar结束
     def _checkbarover(self, data, fromcheck=False, forcedata=None):
-        # 检查的数据，如果fromcheck是True的话，使用DTFaker生成实例，否则使用data
+        # 检查的data_folder，如果fromcheck是True的话，使用DTFaker生成实例，否则使用data
         chkdata = DTFaker(data, forcedata) if fromcheck else data
         # 是否结束
         isover = False
@@ -152,7 +152,7 @@ class _BaseResampler(with_metaclass(metabase.MetaParams, object)):
 
         return isover
 
-    # 判断data数据是否结束
+    # 判断datadata_folder是否结束
     def _barover(self, data):
         # 时间周期
         tframe = self.p.timeframe
@@ -185,7 +185,7 @@ class _BaseResampler(with_metaclass(metabase.MetaParams, object)):
         # 如果seteos是True的话，直接调用_eosset计算session结束的时间
         if seteos:
             self._eosset()
-        # 对比当前的数据时间和session结束的时间
+        # 对比当前的data_folder时间和session结束的时间
         equal = data.datetime[0] == self._nextdteos
         grter = data.datetime[0] > self._nextdteos
         # 如果exact是True的话，ret就等于equal,
@@ -215,18 +215,18 @@ class _BaseResampler(with_metaclass(metabase.MetaParams, object)):
 
     # 检查周
     def _barover_weeks(self, data):
-        # 如果数据的_calendar是None的话
+        # 如果data_folder的_calendar是None的话
         if self.data._calendar is None:
             # 根据日期得到具体的年，周数目和日
             year, week, _ = data.num2date(self.bar.datetime).date().isocalendar()
             # 得到bar的周数目
             yearweek = year * 100 + week
-            # 得到数据的年、周数目和日，并得到数据的周数目
+            # 得到data_folder的年、周数目和日，并得到data_folder的周数目
             baryear, barweek, _ = data.datetime.date().isocalendar()
             bar_yearweek = baryear * 100 + barweek
-            # 如果数据的周数目大于bar的周数目，返回True,否则，返回False
+            # 如果data_folder的周数目大于bar的周数目，返回True,否则，返回False
             return bar_yearweek > yearweek
-        # 如果数据的_calendar不是None的话，调用last_weekday
+        # 如果data_folder的_calendar不是None的话，调用last_weekday
         else:
             return data._calendar.last_weekday(data.datetime.date())
     # 检查月
@@ -278,7 +278,7 @@ class _BaseResampler(with_metaclass(metabase.MetaParams, object)):
         # 如果_eoscheck(data)返回True,那么，函数返回True
         if self._eoscheck(data):
             return True
-        # 如果数据的时间小于bar的时间，返回False
+        # 如果data_folder的时间小于bar的时间，返回False
         if data.datetime[0] < self.bar.datetime:
             return False
 
@@ -300,7 +300,7 @@ class _BaseResampler(with_metaclass(metabase.MetaParams, object)):
             elif self.p.compression == 1:
                 ret = True
             # 如果bar2edge是True的话，并且compression不等于1的话，计算两个的点数除以周期数之后的余数
-            # 如果数据的点数的余数大于bar的点数的余数，返回True
+            # 如果data_folder的点数的余数大于bar的点数的余数，返回True
             else:
                 point_comp = point // self.p.compression
                 barpoint_comp = barpoint // self.p.compression
@@ -310,7 +310,7 @@ class _BaseResampler(with_metaclass(metabase.MetaParams, object)):
 
         return ret
 
-    # 检查是否在数据还没有向前移动的情况下提交当前存储的bar
+    # 检查是否在data_folder还没有向前移动的情况下提交当前存储的bar
     def check(self, data, _forcedata=None):
         '''Called to check if the current stored bar has to be delivered in
         spite of the data not having moved forward. If no ticks from a live
@@ -324,7 +324,7 @@ class _BaseResampler(with_metaclass(metabase.MetaParams, object)):
 
         return self(data, fromcheck=True, forcedata=_forcedata)
 
-    # 判断数据是否是快要形成bar了
+    # 判断data_folder是否是快要形成bar了
     def _dataonedge(self, data):
         # 如果subweek是False的话，如果data._calendar是None的话，返回False和True
         if not self.subweeks:
@@ -361,7 +361,7 @@ class _BaseResampler(with_metaclass(metabase.MetaParams, object)):
             return True, True
         # 如果是日内的话
         if self.subdays:
-            # 获取数据的点数和剩余的点数
+            # 获取data_folder的点数和剩余的点数
             point, prest = self._gettmpoint(data.datetime.time())
             # 如果剩余点数不为0，返回False和True
             if prest:
@@ -439,7 +439,7 @@ class _BaseResampler(with_metaclass(metabase.MetaParams, object)):
         return True
 
 
-# 把小周期的数据抽样形成大周期的数据
+# 把小周期的data_folder抽样形成大周期的data_folder
 class Resampler(_BaseResampler):
     '''This class resamples data of a given timeframe to a larger timeframe.
 
@@ -451,7 +451,7 @@ class Resampler(_BaseResampler):
         "ticks -> 5 seconds" the resulting 5 seconds bars will be aligned to
         xx:00, xx:05, xx:10 ...
 
-        # 在抽样的时候使用时间边界作为目标，比如如果是ticks数据想要抽样程5秒钟，那么将会在xx:00,xx:05,xx:10这样的时间形成bar
+        # 在抽样的时候使用时间边界作为目标，比如如果是ticksdata_folder想要抽样程5秒钟，那么将会在xx:00,xx:05,xx:10这样的时间形成bar
 
       - adjbartime (default: True)
 
@@ -489,7 +489,7 @@ class Resampler(_BaseResampler):
 
     replaying = False
 
-    # 在数据不再产生bar的时候调用，可以被调用多次，有机会在必须传递bar的时候产生额外的bar
+    # 在data_folder不再产生bar的时候调用，可以被调用多次，有机会在必须传递bar的时候产生额外的bar
     def last(self, data):
         if self.bar.isopen():
             if self.doadjusttime:
@@ -622,13 +622,13 @@ class Replayer(_BaseResampler):
         consumed = False
         # 在生成bar的时间点
         onedge = False
-        # 晚到的数据
+        # 晚到的data_folder
         takinglate = False
         # 是否检查bar结束
         docheckover = True
         # 如果fromcheck是False的话
         if not fromcheck:
-            # 调用_latedata判断，看晚到的数据怎么处理,如果返回True
+            # 调用_latedata判断，看晚到的data_folder怎么处理,如果返回True
             if self._latedata(data):
                 # 如果takelate是False的话，就生成一个新的bar
                 if not self.p.takelate:
@@ -647,7 +647,7 @@ class Replayer(_BaseResampler):
                 consumed = onedge
 
             data._tick_fill(force=True)  # update
-        # 如果consumed是True的话，更新数据，如果takinglate是True的话，给bar设置一个新的时间
+        # 如果consumed是True的话，更新data_folder，如果takinglate是True的话，给bar设置一个新的时间
         if consumed:
             self.bar.bupdate(data)
             if takinglate:
@@ -669,7 +669,7 @@ class Replayer(_BaseResampler):
                     data._updatebar(self.bar.lvalues(), forward=False, ago=ago)
                 # 如果不需要检查
                 if not fromcheck:
-                    # 如果不是消耗模式，就使用_save2stack保存数据
+                    # 如果不是消耗模式，就使用_save2stack保存data_folder
                     if not consumed:
                         self.bar.bupdate(data, reopen=True)
                         data._save2stack(erase=True, force=True)

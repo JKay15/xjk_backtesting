@@ -212,7 +212,7 @@ class PandasMarketCalendar(TradingCalendarBase):
     # 获取具体的开盘和收盘时间
     def schedule(self, day, tz=None):
         while True:
-            # 获取交易日所在的index,然后判断是否需要更新日历数据
+            # 获取交易日所在的index,然后判断是否需要更新日历data_folder
             i = self.idcache.index.searchsorted(day.date())
             if i == len(self.idcache):
                 self.idcache = self._calendar.schedule(day, day + self.csize)

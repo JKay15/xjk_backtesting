@@ -29,7 +29,7 @@ class LineAlias(object):
         '''
         一个line在被创建之后就不能set了， 但是内部的值可以通过添加binding来set.
         '''
-        # 如果值是多条line的数据结构，就取第一条line
+        # 如果值是多条line的data_folder结构，就取第一条line
         if isinstance(value, LineMultiple):
             value = value.lines[0]
 
@@ -43,7 +43,7 @@ class LineAlias(object):
 
 class Lines(object):
     '''
-    Lines类是用于管理多根数据线的数据结构
+    Lines类是用于管理多根data_folder线的data_folder结构
     '''
     # Lines用于定义lines的array，并且拥有LineBuffer的大多数接口方法
     # 这些接口方法被传递到self保存的lines上
@@ -51,16 +51,16 @@ class Lines(object):
     
     # 初始状态返回值都是空或者0，能达到想要的效果是因为调用了Lines类的_derive方法进行信息迭代
     # 类方法，返回空元组
-    # 获取父类提供的数据线名称集合
+    # 获取父类提供的data_folder线名称集合
     _getlinesbase = classmethod(lambda cls: ())
     # 类方法，返回空元组
-    # 获取当前类和父类提供的数据线名称集合
+    # 获取当前类和父类提供的data_folder线名称集合
     _getlines = classmethod(lambda cls: ())
     # 类方法，返回0
-    # 获取当前类和父类指定可以额外添加的数据线的数量总和
+    # 获取当前类和父类指定可以额外添加的data_folder线的数量总和
     _getlinesextra = classmethod(lambda cls: 0)
     # 类方法，返回0
-    # 获取父类指定可以额外添加的数据线的数量总和
+    # 获取父类指定可以额外添加的data_folder线的数量总和
     _getlinesextrabase = classmethod(lambda cls: 0)
 
     # Lines类的类方法_derive在元类MetaLineSeries的__new__方法中被调用
@@ -70,9 +70,9 @@ class Lines(object):
         '''
         实现了以下四个功能：
         (1)派生Lines类的子类；
-        (2)整合当前类和父类的数据线信息；
-        (3)为Lines对象添加名为数据线名称的属性，返回对应的LineBuffer对象；
-        (4)为Lines对象添加名为数据线别名的属性，返回对应的LineBuffer对象。
+        (2)整合当前类和父类的data_folder线信息；
+        (3)为Lines对象添加名为data_folder线名称的属性，返回对应的LineBuffer对象；
+        (4)为Lines对象添加名为data_folder线别名的属性，返回对应的LineBuffer对象。
         '''
         # 创建这个class的子类，这个子类将会包含这个class的lines,extralines, otherbases的lines
         # name将会用于最终类的名字的后缀
@@ -84,8 +84,8 @@ class Lines(object):
         # 其他类的额外的lines，默认是0
         obasesextralines = 0
         
-        # 通过遍历otherbases并获取其元素的数据线信息，
-        # obaseslines和obasesextralines分别整合了除第一顺位以外其它父类提供的数据线名称和额外可添加的数据线数量
+        # 通过遍历otherbases并获取其元素的data_folder线信息，
+        # obaseslines和obasesextralines分别整合了除第一顺位以外其它父类提供的data_folder线名称和额外可添加的data_folder线数量
         # 对其他的bases进行循环
         for otherbase in otherbases:
             # 如果otherbase是元组，直接添加到obaseslines中去
@@ -96,8 +96,8 @@ class Lines(object):
                 obaseslines += otherbase._getlines()
                 obasesextralines += otherbase._getlinesextra()
 
-        # 如果参数linesoverride为False，则表示不覆盖父类的数据线信息，
-        # 此时变量baselines和baseextralines分别整合了所有父类提供的数据线名称和额外可添加的数据线数量
+        # 如果参数linesoverride为False，则表示不覆盖父类的data_folder线信息，
+        # 此时变量baselines和baseextralines分别整合了所有父类提供的data_folder线名称和额外可添加的data_folder线数量
         if not linesoverride:
             baselines = cls._getlines() + obaseslines
             baseextralines = cls._getlinesextra() + obasesextralines
@@ -106,7 +106,7 @@ class Lines(object):
             baseextralines = 0
 
         # 在baselines和baseextralines的基础之上，
-        # 变量clslines和clsextralines分别添加了当前类提供的数据线名称和额外可添加的数据线数量
+        # 变量clslines和clsextralines分别添加了当前类提供的data_folder线名称和额外可添加的data_folder线数量
         clslines = baselines + lines
         # class的额外的lines，整数
         clsextralines = baseextralines + extralines
@@ -148,7 +148,7 @@ class Lines(object):
         # 如果lalias是None，l2alias是空的字典，否则返回lalias._getkwargsdefault()
         # l2alias = {} if lalias is None else lalias._getkwargsdefault() ，在这里面没用，移动到下面
         
-        # 使用描述器LineAlias实现了_derive方法的第三个功能：为Lines对象添加名为数据线名称的属性，返回对应的LineBuffer对象
+        # 使用描述器LineAlias实现了_derive方法的第三个功能：为Lines对象添加名为data_folder线名称的属性，返回对应的LineBuffer对象
         for line, linealias in l2add:
             # line是一个整数，linealias如果不是字符串，那么和可能是元组或者列表，第一个就是它的名字
             if not isinstance(linealias, string_types):
@@ -159,7 +159,7 @@ class Lines(object):
             # 在newcls中绑定linealias属性值为desc，个人感觉是方便数字和line名字的转换
             setattr(newcls, linealias, desc)
 
-        # 同样使用描述器LineAlias实现了_derive方法的第四个功能：为Lines对象添加名为数据线别名的属性，返回对应的LineBuffer对象
+        # 同样使用描述器LineAlias实现了_derive方法的第四个功能：为Lines对象添加名为data_folder线别名的属性，返回对应的LineBuffer对象
         # 如果l2alias不是空的话，有需要设置，会运行下面的代码进行设置。这个逻辑写的并不是很高效，应该先判断下l2alias是否是空的，如果是空的话，就忽略，不运行
         # 如果lalias不是None的 情况下，l2alias才不是空
         for line, linealias in enumerate(newcls._getlines()):
@@ -203,8 +203,8 @@ class Lines(object):
     def __init__(self, initlines=None):
         '''
         为Lines对象添加了一个名为lines的实例属性，该属性是一个列表
-        根据数据线的数量 (即_getlines方法返回的元组的长度)，相应数量的LineBuffer对象将被添加到这个列表中
-        如果额外可添加数据线的数量 (即_getlinesextra方法的返回值) 不为零，默认情况下相应数量的LineBuffer对象将被添加到列表中
+        根据data_folder线的数量 (即_getlines方法返回的元组的长度)，相应数量的LineBuffer对象将被添加到这个列表中
+        如果额外可添加data_folder线的数量 (即_getlinesextra方法的返回值) 不为零，默认情况下相应数量的LineBuffer对象将被添加到列表中
         '''
         # 初始化lines,设定lines是一个列表
         self.lines = list()
@@ -243,7 +243,7 @@ class Lines(object):
 
     def get(self, ago=0, size=1, line=0):
         '''
-        根据整数line作为index获取某条line，然后获取包含ago在内的之前的size个数量的数据
+        根据整数line作为index获取某条line，然后获取包含ago在内的之前的size个数量的data_folder
         '''
         return self.lines[line].get(ago, size=size)
 
@@ -255,14 +255,14 @@ class Lines(object):
 
     def forward(self, value=NAN, size=1):
         '''
-        实现将对数据容器的操作推广到Lines对象的实例属性lines中的每个LineBuffer对象
+        实现将对data_folder容器的操作推广到Lines对象的实例属性lines中的每个LineBuffer对象
         '''
         for line in self.lines:
             line.forward(value, size=size)
 
     def backwards(self, size=1, force=False):
         '''
-        实现将对数据容器的操作推广到Lines对象的实例属性lines中的每个LineBuffer对象
+        实现将对data_folder容器的操作推广到Lines对象的实例属性lines中的每个LineBuffer对象
         '''
         for line in self.lines:
             line.backwards(size, force=force)
@@ -304,7 +304,7 @@ class Lines(object):
 
     def buflen(self, line=0):
         '''
-        返回line缓存的数据的长度
+        返回line缓存的data_folder的长度
         '''
         return self.lines[line].buflen()
 
@@ -314,9 +314,9 @@ class MetaLineSeries(LineMultiple.__class__):
     这个类是给LineSeries做一些预处理工作，主要是获取plotinfo、lines、plotlines等相关的属性
     然后创建一个_obj并给它增加相应的属性并赋值
 
-      - 其__new__方法的核心功能是整合数据线信息:
+      - 其__new__方法的核心功能是整合data_folder线信息:
         具体来说，假设类Cls是由元类MetaLineSeries或其子类所创建
-        那么，用户可以在定义类Cls时通过特定的类变量输入数据线的相关信息
+        那么，用户可以在定义类Cls时通过特定的类变量输入data_folder线的相关信息
         接下来，元类MetaLineSeries的__new__方法会对这些类变量进行加工
 
       - 其donew方法的核心是为实例化的对象整合参数信息
@@ -329,15 +329,15 @@ class MetaLineSeries(LineMultiple.__class__):
 
     def __new__(meta, name, bases, dct):
         '''
-        整合数据线信息
+        整合data_folder线信息
         '''
         # 给dct增加一个alias,aliased的key，并设定默认值是(),"",其中aliases的值是一个空的列表，aliased的值是空的字符串。字典的具体用法
         aliases = dct.setdefault('alias', ())
         aliased = dct.setdefault('aliased', '')
 
-        # 从参数dct中剥离在当前类中通过类变量lines、linesoveride、extralines和linealias输入的数据线信息
+        # 从参数dct中剥离在当前类中通过类变量lines、linesoveride、extralines和linealias输入的data_folder线信息
         # 并分别存放在变量newlines、linesoverride、extralines和newlalias中
-        # 这么做的目的是避免覆盖当前类的父类同名类变量所包含的数据线信息
+        # 这么做的目的是避免覆盖当前类的父类同名类变量所包含的data_folder线信息
         
         # 从字典中删除linesoverride的key，并用linesoverride接收这个值，如果不存在这个key，就返回一个False
         linesoverride = dct.pop('linesoverride', False)
@@ -365,7 +365,7 @@ class MetaLineSeries(LineMultiple.__class__):
         oblalias = [x.linealias for x in bases[1:] if hasattr(x, 'linealias')]
         # AutoInfoClass类的_derive方法创建一个对象，给cls的linealias赋值
         cls.linealias = la = lalias._derive('la_' + name, newlalias, oblalias)
-        # 为类cls添加了名为lines的类变量，其属性值是一个Lines类 (或其子类)，并通过调用它的_derive方法整合了当前类的和其父类中有关数据线的信息
+        # 为类cls添加了名为lines的类变量，其属性值是一个Lines类 (或其子类)，并通过调用它的_derive方法整合了当前类的和其父类中有关data_folder线的信息
         # 从cls获取lines属性值，如果没有返回Lines类
         lines = getattr(cls, 'lines', Lines)
 
@@ -468,7 +468,7 @@ class LineSeries(with_metaclass(MetaLineSeries, LineMultiple)):
 
     @property
     def array(self):
-        # 如果调用array，将会返回添加进去的第一条line的数据
+        # 如果调用array，将会返回添加进去的第一条line的data_folder
         return self.lines[0].array
 
     def __getattr__(self, name):
