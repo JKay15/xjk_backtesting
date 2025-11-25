@@ -1,43 +1,33 @@
-# 当代量化交易系统原理与实现大作业
+# An Event-Driven Quantitative Trading Backtesting Engine in Python
 
 
-
-## 1. 项目亮点
-
-（1） **==完成了基础要求==**，可以在任何时间段上进行n日反转回测，并且能够展示该策略的:净值曲线，超额收益，年化收益，年化波动，夏普比率，最大回撤
-
-（2）基于backtrader的框架，按照我们的业务需要精简了其中的逻辑（尤其是一些外部接口、实盘操作的逻辑以及复杂的指标设计），实现了基于**==事件驱动==**的量化回测系统，同时具有==**丰富的拓展性**==
-
-（3）灵活多样的策略设计支持：不论是**==股票、期货、期权、基金还是数字货币==**，框架强大的数据流datafeed类都可以支持并且实现粒度的转化，在这个基础上strategy类能够提供模块化的策略设计思路，通过一套**==类似pytorch==**设计神经网络的较为直观的模版，就可以实现用户所需的一切策略（当然python最好不要跑高频）——我们展示了股票、期货的常见策略（来自《151 trading strategies》）
-
-（4）强大的**==仓位管理系统==**：专门设置sizer和position类进行仓位管理，可以在回测任何时刻反馈仓位信息，也可以通过analyzer记录全过程的设计的任何指标
-
-（5）强大的数据处理系统：支持**==tick、日线、周线、月线、年线==**等各个数据粒度的数据，支持pandas和CSV的数据输入，支持从具有多周期回测的能力，既能够兼容不同周期的数据的策略运行，也能够支持由单一周期数据生成的多周期数据，通过line的一系列类实现。
-
-（6）对python性能的优化：使用了**==多线程、向量化操作==**（可以选择关闭）技术，尽可能地利用有限的算力高效地完成回测任务，未来能够通过cython对部分函数进行优化。
-
-（7）丰富的指标和绘图功能：提供了**==talib库==**的指标支持，提供了**==matplotlib、pyfolio和HTML交互式==**数据呈现，充分满足了对于回测结果检验和对比的需求。
-
-（8）**==因子比较==**和检验的功能：analyzer类提供的丰富的指标分析器能够实时保存不同策略运行过程中的响应指标，使用方法也十分简单，只需要一句代码即可（自定义指标需要另写一个类），满足了不同因子间在回测后数据的存储和比较的需求。
-
-## 2 项目内容
-
+1. Overview
+This project presents a lightweight, event-driven quantitative trading backtesting engine built in Python. It is inspired by the popular backtrader framework but has been streamlined and re-architected to prioritize modularity, extensibility, and performance for rapid strategy research and validation.
+2. Core Features
+Event-Driven Architecture: Built on a core event-driven loop, ensuring high modularity and making it easy to extend with new components like custom data feeds, analyzers, or brokers.
+PyTorch-like Strategy Interface: Design complex trading strategies with an intuitive, modular class structure inspired by PyTorch's nn.Module. This allows researchers to focus on algorithmic logic rather than boilerplate code.
+Multi-Asset & Multi-Timeframe Support:
+The powerful DataFeed class natively supports a wide range of asset classes, including stocks, futures, options, funds, and cryptocurrencies.
+Seamlessly handles multiple time granularities from tick-level to daily, weekly, and yearly data, enabling the development and testing of sophisticated multi-timeframe strategies.
+Advanced Position Sizing & Management: Decoupled Sizer and Position classes allow for sophisticated risk and capital management logic, independent of the core strategy execution.
+Performance-Aware Design: Incorporates performance optimization techniques such as multithreading for data processing and vectorized operations (optional) with NumPy to accelerate backtests on standard hardware.
+Rich Analytics & Visualization Suite:
+Integrates seamlessly with TA-Lib for a comprehensive library of technical indicators.
+Provides multiple plotting backends including matplotlib, pyfolio for professional tear sheets, and interactive HTML reports for dynamic result exploration.
+Built-in Factor Analysis: The Analyzer module allows for easy tracking and comparison of custom metrics (e.g., returns, volatility, drawdown) across different strategy runs, facilitating robust quantitative factor research with minimal setup.
+3. Project Structure
+code
+Code
 .
-├── backtesting：回测框架底层代码
-├── 数据：回测策略使用的股票、期货等数据（由于后期的打包，某些策略代码中的文件目录可能有点问题，请老师助教见谅，只需要调整到这个文件夹中的路径就好了）
-├── 期货策略：实现了包括==**tick数据**==、趋势跟踪、十大经典策略（部分）
-├── 股票策略：实现了**==均线、动量、趋势、通道、支撑、神经网络==**等策略
-├── 多周期回测示例
-├── 仓位管理功能示例
-├── 绘图和指标展示示例
-└── 神经网络接入系统示例
-
-
-
-## 3 改进方向
-
-（1）python回测系统的性能问题：较为温和的优化方向时使用cython预编译一部分较为耗时的函数，比如datetime处理的相关函数；较为激进的优化方向是用C++元编程的思路复刻这个项目，但是由于作者的时间和精力实在有限，所以没能在这个学期做到，即使已经有了backtrader这个较为完善的系统参考，这是比较遗憾的。
-
-（2）策略部分主要来自《151 trading strategies》，对于更为现代和前沿的策略因为时间、算力的原因没有能够呈现出来，但是既然有了这个回测系统，未来应该可以实现出来/
-
-（3）没有写出一个文档供参考。
+├── backtesting/          # Core source code of the backtesting engine
+├── data/                 # Sample data for various assets (stocks, futures, etc.)
+├── futures_strategies/   # Example strategies for futures, including tick-based and trend-following models
+├── stock_strategies/     # Example strategies for stocks, including moving average, momentum, trend, and channel-based models, as well as an example of a neural network strategy
+├── multi_period_example/ # Demonstrates multi-timeframe backtesting capabilities
+├── sizer_example/        # Demonstrates the position sizing and management functionalities
+├── plotting_example/     # Showcases the various plotting and analytics features
+└── nn_integration_example/ # Shows how to integrate a neural network model into a strategy
+4. Roadmap & Future Work
+Performance Enhancements: Further performance gains could be achieved by profiling and compiling critical hot-spots (e.g., datetime handling) with Cython. A more ambitious direction involves re-implementing the core event-driven engine in a high-performance language like C++ or Rust.
+Expanded Strategy Library: The framework can be extended to include more modern and cutting-edge strategies from recent academic literature, beyond the classic strategies currently implemented.
+Comprehensive Documentation: Developing a full-fledged documentation site (e.g., using Sphinx or MkDocs) with user guides and API references to improve usability for other researchers and developers.
