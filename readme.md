@@ -16,8 +16,8 @@ Integrates seamlessly with TA-Lib for a comprehensive library of technical indic
 Provides multiple plotting backends including matplotlib, pyfolio for professional tear sheets, and interactive HTML reports for dynamic result exploration.
 Built-in Factor Analysis: The Analyzer module allows for easy tracking and comparison of custom metrics (e.g., returns, volatility, drawdown) across different strategy runs, facilitating robust quantitative factor research with minimal setup.
 3. Project Structure
-code
-Code
+
+```
 .
 ├── backtesting/          # Core source code of the backtesting engine
 ├── data/                 # Sample data for various assets (stocks, futures, etc.)
@@ -27,6 +27,7 @@ Code
 ├── sizer_example/        # Demonstrates the position sizing and management functionalities
 ├── plotting_example/     # Showcases the various plotting and analytics features
 └── nn_integration_example/ # Shows how to integrate a neural network model into a strategy
+```
 4. Roadmap & Future Work
 Performance Enhancements: Further performance gains could be achieved by profiling and compiling critical hot-spots (e.g., datetime handling) with Cython. A more ambitious direction involves re-implementing the core event-driven engine in a high-performance language like C++ or Rust.
 Expanded Strategy Library: The framework can be extended to include more modern and cutting-edge strategies from recent academic literature, beyond the classic strategies currently implemented.
